@@ -27,9 +27,6 @@ namespace WDE.DatabaseEditors.Solution
         
         public IDocument GetEditor(DatabaseTableSolutionItem item)
         {
-            if (GlobalApplication.Backend == GlobalApplication.AppBackend.WPF)
-                throw new Exception("Table editors are not supported in WPF version");
-            
             var definition = tableDefinitionProvider.GetDefinition(item.DefinitionId);
             if (definition == null)
                 throw new Exception("Cannot find table editor with definition " + item.DefinitionId);

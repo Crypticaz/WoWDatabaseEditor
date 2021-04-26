@@ -8,9 +8,6 @@
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300"
              x:Name="rootWindow">
-    <UserControl.Resources>
-        <ResourceDictionary Source="../Controls/DbTableFieldViewControls.xaml"></ResourceDictionary>
-    </UserControl.Resources>
     <UserControl.InputBindings>
         <KeyBinding Key="Delete" Command="{Binding DeleteRow}" />
         <KeyBinding Modifiers="Control" Key="S" Command="{Binding Save}" />
@@ -37,7 +34,6 @@
                               ColumnHeaderContainerStyle="{DynamicResource GridViewColumnHeader}">
                         <helpers:GridViewColumns.ColumnCellTemplate>
                             <DataTemplate>
-                                <controls:DbTableFieldValueView ShowModifiedIcon="False" />
                             </DataTemplate>
                         </helpers:GridViewColumns.ColumnCellTemplate>
                     </GridView>
