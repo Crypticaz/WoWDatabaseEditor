@@ -2,6 +2,7 @@
 using System.Windows.Controls;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels;
+using WDE.DatabaseEditors.ViewModels.Template;
 using WDE.Parameters;
 using WDE.Parameters.Models;
 

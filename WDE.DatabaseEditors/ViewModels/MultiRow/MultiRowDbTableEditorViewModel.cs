@@ -1,8 +1,7 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Reactive.Linq;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using AsyncAwaitBestPractices.MVVM;
@@ -29,11 +28,10 @@ using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.QueryGenerators;
 using WDE.DatabaseEditors.Solution;
 using WDE.MVVM;
-using WDE.MVVM.Observable;
 
-namespace WDE.DatabaseEditors.ViewModels
+namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class TemplateDbTableEditorViewModel : ObservableBase, ISolutionItemDocument
+    public class MultiRowDbTableEditorViewModel : ObservableBase, ISolutionItemDocument
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -47,7 +45,7 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly DatabaseTableSolutionItem solutionItem;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
-        public TemplateDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
+        public MultiRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
@@ -79,22 +77,18 @@ namespace WDE.DatabaseEditors.ViewModels
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
             Save = new DelegateCommand(SaveSolutionItem);
 
-            CurrentFilter = FunctionalExtensions.Select(this.ToObservable(t => t.SearchText), FilterItem);
-
-            var comparer = Comparer<DatabaseRowsGroupViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder));
-            AutoDispose(Rows.Connect()
-                .Filter(CurrentFilter)
-                .GroupOn(t => (t.CategoryName, t.CategoryIndex))
+            var comparer = Comparer<DatabaseEntitiesGroupViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder));
+            AutoDispose(rows.Connect()
+                .GroupOn(t => t.Key)
                 .Transform(GroupCreate)
                 .DisposeMany()
-                .FilterOnObservable(t => t.ShowGroup)
                 .Sort(comparer)
-                .Bind(out ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> filteredFields)
+                .Bind(out ReadOnlyObservableCollection<DatabaseEntitiesGroupViewModel> groupedRows)
                 .Subscribe(a =>
                 {
                     
                 }, b => throw b));
-            FilteredRows = filteredFields;
+            Rows = groupedRows;
 
             AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
                 .Subscribe(ExecuteSql));
@@ -155,13 +149,13 @@ namespace WDE.DatabaseEditors.ViewModels
         
         private void SetToNull(DatabaseCellViewModel? view)
         {
-            if (view != null && view.CanBeNull && !view.Parent.IsReadOnly) 
+            if (view != null && view.CanBeNull && !view.IsReadOnly) 
                 view.ParameterValue.SetNull();
         }
 
         private async Task Revert(DatabaseCellViewModel? view)
         {
-            if (view == null || view.Parent.IsReadOnly)
+            if (view == null || view.IsReadOnly)
                 return;
             
             view.ParameterValue.Revert();
@@ -195,17 +189,9 @@ namespace WDE.DatabaseEditors.ViewModels
             RemoveEntity(view.ParentEntity);
         }
 
-        private DatabaseRowsGroupViewModel GroupCreate(IGroup<DatabaseRowViewModel, (string CategoryName, int CategoryIndex)> @group)
+        private DatabaseEntitiesGroupViewModel GroupCreate(IGroup<DatabaseEntityViewModel, uint> @group)
         {
-            return new (@group, GetGroupVisibility(@group.GroupKey.CategoryName));
-        }
-
-        private Func<DatabaseRowViewModel, bool> FilterItem(string text)
-        {
-            if (string.IsNullOrEmpty(text)) 
-                return _ => true;
-            var lower = text.ToLower();
-            return item => item.Name.ToLower().Contains(lower);
+            return new (group);
         }
 
         private bool CanRedo() => History.CanRedo;
@@ -252,27 +238,13 @@ namespace WDE.DatabaseEditors.ViewModels
             solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
             
             {
-                Rows.Clear();
+                rows.Clear();
                 Entities.Clear();
-                Header.Clear();
-                groupVisibilityByName.Clear();
                 tableDefinition = data.TableDefinition;
-
-                int categoryIndex = 0;
-                int columnIndex = 0;
-
-                foreach (var group in tableDefinition.Groups)
-                {
-                    categoryIndex++;
-                    groupVisibilityByName[group.Name] = new ReactiveProperty<bool>(true);
-
-                    foreach (var column in group.Fields)
-                    {
-                        var row = new DatabaseRowViewModel(column, group, categoryIndex, columnIndex++);
-                        Rows.Add(row);
-                    }
-                }
-
+                columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
+                Columns.Clear();
+                Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)));
+                
                 await AsyncAddEntities(data.Entities);
             }
             
@@ -283,7 +255,7 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private void SetupHistory()
         {
-            var historyHandler = AutoDispose(new TemplateTableEditorHistoryHandler(this));
+            var historyHandler = AutoDispose(new MultiRowTableEditorHistoryHandler(this));
             History.PropertyChanged += (_, _) =>
             {
                 undoCommand.RaiseCanExecuteChanged();
@@ -314,10 +286,8 @@ namespace WDE.DatabaseEditors.ViewModels
         }
         
         public ObservableCollection<DatabaseEntity> Entities { get; } = new();
-        public ObservableCollection<string> Header { get; } = new();
-        public ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> FilteredRows { get; }
-        public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
-        public SourceList<DatabaseRowViewModel> Rows { get; } = new();
+        public ReadOnlyObservableCollection<DatabaseEntitiesGroupViewModel> Rows { get; }
+        public SourceList<DatabaseEntityViewModel> rows { get; } = new();
 
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
@@ -340,12 +310,9 @@ namespace WDE.DatabaseEditors.ViewModels
                 return false;
             
             Entities.RemoveAt(indexOfEntity);
-            Header.RemoveAt(indexOfEntity);
-            foreach (var row in Rows.Items)
+            foreach (var row in rows.Items)
                 row.Cells.RemoveAt(indexOfEntity);
 
-            ReEvalVisibility();
-            
             return true;
         }
         
@@ -356,16 +323,15 @@ namespace WDE.DatabaseEditors.ViewModels
 
         public bool ForceInsertEntity(DatabaseEntity entity, int index)
         {
-            Dictionary<string, IObservable<bool>?> groupVisibility = new();
+            var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key);
+            var row = new DatabaseEntityViewModel(entity, name);
             
-            foreach (var row in Rows.Items)
+            foreach (var column in columns)
             {
-                var column = row.ColumnData;
-                
                 var cell = entity.GetCell(column.DbColumnName);
                 if (cell == null)
                     throw new Exception("this should never happen");
-                            
+
                 IParameterValue parameterValue = null!;
                 if (cell is DatabaseField<long> longParam)
                 {
@@ -380,40 +346,17 @@ namespace WDE.DatabaseEditors.ViewModels
                     parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                 }
 
-                IObservable<bool>? cellVisible = null!;
-                var group = row.GroupData;
-                if (group.ShowIf.HasValue)
-                {
-                    if (!groupVisibility.TryGetValue(group.Name, out cellVisible))
-                    {
-                        var compareCell = entity.GetCell(group.ShowIf.Value.ColumnName);
-                        if (compareCell != null && compareCell is DatabaseField<long> lField)
-                        {
-                            var comparedValue = group.ShowIf.Value.Value;
-                            cellVisible = Observable.Select(lField.Current.ToObservable(p => p.Value), val => val == comparedValue);
-                        }
-                        groupVisibility[group.Name] = cellVisible;
-                    }
-                }
-
-                var cellViewModel = AutoDispose(new DatabaseCellViewModel(row, entity, cell, parameterValue, cellVisible));
-                row.Cells.Insert(index, cellViewModel);
+                var cellViewModel = AutoDispose(new DatabaseCellViewModel(column, row, entity, cell, parameterValue));
+                row.Cells.Add(cellViewModel);
             }
 
             Entities.Insert(index, entity);
-            var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key);
-            Header.Insert(index, name);
-
-            var typeCell = entity.GetCell("type");
-            if (typeCell == null)
-                return true;
-            typeCell.PropertyChanged += (_, _) => ReEvalVisibility();
-
-            ReEvalVisibility();
-            
+            rows.Add(row);
             return true;
         }
-        
+
+        private IList<DbEditorTableGroupFieldJson> columns = new List<DbEditorTableGroupFieldJson>();
+        public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
         private DatabaseTableDefinitionJson tableDefinition;
 
         private async Task AsyncAddEntities(IList<DatabaseEntity> tableDataEntities)
@@ -424,39 +367,8 @@ namespace WDE.DatabaseEditors.ViewModels
                 if (await AddEntity(entity))
                     finalList.Add(entity);
             }
-
-            ReEvalVisibility();
         }
 
-        private void ReEvalVisibility()
-        {
-            foreach (var group in tableDefinition.Groups)
-            {
-                if (!group.ShowIf.HasValue)
-                    continue;
-
-                groupVisibilityByName[group.Name].Value = false;
-                foreach (var entity in Entities)
-                {
-                    var cell = entity.GetCell(group.ShowIf.Value.ColumnName);
-                    if (cell is not DatabaseField<long> lField)
-                        continue;
-                    if (lField.Current.Value == group.ShowIf.Value.Value)
-                    {
-                        groupVisibilityByName[group.Name].Value = true;
-                        break;
-                    }
-                }
-            }
-        }
-
-        private Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
-
-        public IObservable<bool> GetGroupVisibility(string str)
-        {
-            return groupVisibilityByName[str];
-        }
-        
         private bool isLoading;
         public bool IsLoading
         {
@@ -472,13 +384,6 @@ namespace WDE.DatabaseEditors.ViewModels
         private DelegateCommand undoCommand;
         private DelegateCommand redoCommand;
         
-        private string searchText = "";
-        public string SearchText
-        {
-            get => searchText;
-            set => SetProperty(ref searchText, value);
-        }
-
         private string title;
         public string Title
         {
@@ -497,5 +402,4 @@ namespace WDE.DatabaseEditors.ViewModels
         public IHistoryManager History { get; }
         public ISolutionItem SolutionItem { get; }
     }
-
 }

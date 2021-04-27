@@ -5,7 +5,7 @@ using Avalonia.Input.Platform;
 using Avalonia.Markup.Xaml;
 using Prism.Commands;
 
-namespace WDE.DatabaseEditors.Avalonia.Views
+namespace WDE.DatabaseEditors.Avalonia.Views.Template
 {
     public class TemplateDbTableEditorView : UserControl
     {

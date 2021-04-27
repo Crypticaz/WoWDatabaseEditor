@@ -1,6 +1,7 @@
 ﻿using System;
 using WDE.Common.History;
 using WDE.DatabaseEditors.ViewModels;
+using WDE.DatabaseEditors.ViewModels.Template;
 using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.History

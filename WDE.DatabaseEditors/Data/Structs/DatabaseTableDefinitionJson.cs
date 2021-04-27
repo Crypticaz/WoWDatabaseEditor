@@ -42,7 +42,7 @@ namespace WDE.DatabaseEditors.Data.Structs
         public string Picker { get; set; } = "";
 
         [JsonProperty(PropertyName = "table_name_source_field")]
-        public string TableNameSource { get; set; } = "";
+        public string? TableNameSource { get; set; }
         
         [JsonProperty(PropertyName = "foreign_tables")]
         public IList<DatabaseForeignTableJson>? ForeignTable { get; set; }

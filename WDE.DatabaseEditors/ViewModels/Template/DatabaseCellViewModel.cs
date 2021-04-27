@@ -3,7 +3,7 @@ using WDE.DatabaseEditors.Models;
 using WDE.MVVM;
 using WDE.MVVM.Observable;
 
-namespace WDE.DatabaseEditors.ViewModels
+namespace WDE.DatabaseEditors.ViewModels.Template
 {
     public class DatabaseCellViewModel : ObservableBase
     {

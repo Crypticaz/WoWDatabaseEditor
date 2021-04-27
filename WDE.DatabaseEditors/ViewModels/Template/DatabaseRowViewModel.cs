@@ -2,7 +2,7 @@ using System.Collections.ObjectModel;
 using Prism.Mvvm;
 using WDE.DatabaseEditors.Data.Structs;
 
-namespace WDE.DatabaseEditors.ViewModels
+namespace WDE.DatabaseEditors.ViewModels.Template
 {
     public class DatabaseRowViewModel : BindableBase
     {

@@ -2247,5 +2247,17 @@
 			"31": {"name": "MOONKIN"},
 			"32": {"name": "SPIRITOFREDEMPTION"}
 		}
-	}
+	},
+	"QuestStatusParameter": {
+		"isflag": true,
+		"prefix": "QUEST_STATUS",
+		"name": "Quest status (mask)",
+		"values": {
+			"1": {"name": "none", "description": "Player does not have or had quest at all. He could accept it, but he did not (yet)."},
+			"2": {"name": "complete", "description": "Player fulfilled objectives, but did not hand it in yet."},
+			"8": {"name": "incomplete", "description": "Player did not fulfill objectives yet"},
+			"32": {"name": "failed", "description": "Player failed to fulfill objectives for any reason, e.g. time limit"},
+			"64": {"name": "rewarded", "description": "Player handed quest in and this is sort of a post-quest interaction"}
+		}
+	},
 }

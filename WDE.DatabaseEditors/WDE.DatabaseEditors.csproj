@@ -17,22 +17,7 @@
       <ProjectReference Include="..\WoWDatabaseEditor.Common\WDE.Common\WDE.Common.csproj" />
     </ItemGroup>
     <ItemGroup>
-      <None Remove="DbDefinitions\creature_template.json" />
-      <Content Include="DbDefinitions\creature_template.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Remove="DbDefinitions\gameobject_template.json" />
-      <Content Include="DbDefinitions\gameobject_template.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </Content>
-      <None Remove="DbDefinitions\gameobject_template_names_swap.json" />
-      <None Update="DbDefinitions\creature_loot_template.json">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="DbDefinitions\quest_template.json">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
-      <None Update="DbDefinitions\instance_template.json">
+      <None Update="DbDefinitions\*.json">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>

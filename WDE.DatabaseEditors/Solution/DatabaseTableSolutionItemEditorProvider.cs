@@ -6,6 +6,8 @@ using WDE.Common.Tasks;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Loaders;
 using WDE.DatabaseEditors.ViewModels;
+using WDE.DatabaseEditors.ViewModels.MultiRow;
+using WDE.DatabaseEditors.ViewModels.Template;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.Solution
@@ -31,10 +33,8 @@ namespace WDE.DatabaseEditors.Solution
             if (definition == null)
                 throw new Exception("Cannot find table editor with definition " + item.DefinitionId);
 
-            //if (definition.IsMultiRecord)
-            //    return containerRegistry.Resolve<MultiRecordDbTableEditorViewModel>(
-            //        (typeof(DatabaseTableSolutionItem), item));
-            
+            if (definition.IsMultiRecord)
+                return  containerRegistry.Resolve<MultiRowDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), item));
             return containerRegistry.Resolve<TemplateDbTableEditorViewModel>((typeof(DatabaseTableSolutionItem), item));
         }
     }

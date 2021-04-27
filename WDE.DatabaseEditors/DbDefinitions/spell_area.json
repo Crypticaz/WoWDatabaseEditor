@@ -1,0 +1,78 @@
+{
+  "id": "spell_area",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Spell area",
+  "description": "Spell area table is responsible for applying auras in specific areas or zones",
+  "table_name": "spell_area",
+  "table_index_name": "area",
+  "single_solution_name": "spell_area",
+  "multi_solution_name": "spell_area",
+  "reload_command": "reload spell_area",
+  "multi_record": true,
+  "picker": "ZoneAreaParameter",
+  "groups": [
+    {
+      "group_name": "only",
+      "fields": [
+        {
+          "name": "Area",
+          "db_column_name": "area",
+          "read_only": true,
+          "value_type": "ZoneAreaParameter"
+        },
+        {
+          "name": "Spell",
+          "db_column_name": "spell",
+          "value_type": "SpellParameter"
+        },
+        {
+          "name": "Quest start",
+          "db_column_name": "quest_start",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Quest start status",
+          "db_column_name": "quest_start_status",
+          "value_type": "QuestStatusParameter"
+        },
+        {
+          "name": "Quest end",
+          "db_column_name": "quest_end",
+          "value_type": "QuestParameter"
+        },
+        {
+          "name": "Quest end status",
+          "db_column_name": "quest_end_status",
+          "value_type": "QuestStatusParameter"
+        },
+        {
+          "name": "Autocast",
+          "db_column_name": "autocast",
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Aura condition",
+          "db_column_name": "aura_spell",
+          "value_type": "SpellAreaSpellParameter"
+        },
+        {
+          "name": "Race condition",
+          "db_column_name": "racemask",
+          "value_type": "RaceMaskParameter"
+        },
+        {
+          "name": "Gender condition",
+          "db_column_name": "gender",
+          "value_type": "GenderParameter"
+        },
+        {
+          "name": "Gender condition",
+          "db_column_name": "gender",
+          "value_type": "GenderParameter"
+        }
+      ]
+    }
+  ]
+}

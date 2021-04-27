@@ -2,7 +2,7 @@
 using System.Windows.Input;
 using Prism.Commands;
 
-namespace WDE.DatabaseEditors.WPF.Views
+namespace WDE.DatabaseEditors.WPF.Views.Template
 {
     public partial class TemplateDbTableEditorView : UserControl
     {

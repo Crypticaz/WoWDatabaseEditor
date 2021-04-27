@@ -1,0 +1,127 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:WDE.Common.Avalonia.Controls;assembly=WDE.Common.Avalonia"
+             xmlns:controls1="clr-namespace:AvaloniaStyles.Controls;assembly=AvaloniaStyles"
+             xmlns:helpers="clr-namespace:WDE.DatabaseEditors.Avalonia.Helpers"
+             xmlns:controls2="clr-namespace:WDE.DatabaseEditors.Avalonia.Controls"
+             xmlns:styles="clr-namespace:AvaloniaStyles.Styles;assembly=AvaloniaStyles"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorView">
+    <UserControl.Resources>
+    </UserControl.Resources>
+    <UserControl.Styles>
+        <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
+                                       LightSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsLight.axaml"/>
+        <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastCellView.axaml" />
+        <StyleInclude Source="avares://WDE.DatabaseEditors.Avalonia/Controls/FastBoolCellView.axaml" />
+        <Style Selector="Panel.alternating">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.NormalAlternate}" />
+        </Style>
+        <Style Selector="Panel.alternating.odd">
+            <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
+        </Style>
+    </UserControl.Styles>
+    <UserControl.DataTemplates>
+        <helpers:FieldValueTemplateSelector>
+            <helpers:FieldValueTemplateSelector.BoolTemplate>
+                <DataTemplate>
+                    <controls2:FastBoolCellView Height="24" Margin="0,0,10,0"
+                        ToolTip.Tip="{Binding OriginalValueTooltip}"
+                        Focusable="False"
+                        IsActive="{Binding IsVisible}"
+                        IsModified="{Binding IsModified}" 
+                        IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
+                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
+                        Value="{Binding AsBoolValue}"/>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.BoolTemplate>
+            <helpers:FieldValueTemplateSelector.GenericTemplate>
+                <DataTemplate>
+                    <controls2:FastCellView Height="24" Margin="0,0,10,0"
+                        ToolTip.Tip="{Binding OriginalValueTooltip}"
+                        Focusable="False"
+                        IsActive="{Binding IsVisible}"
+                        IsModified="{Binding IsModified}" 
+                        ShowChooseButton="{Binding ParameterValue.Parameter.HasItems, Mode=OneTime}"
+                        IsReadOnly="{Binding Parent.IsReadOnly, Mode=OneTime}"
+                        Value="{Binding ParameterValue.Value}"
+                        ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
+                        SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
+                        RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
+                        CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
+                        StringValue="{Binding ParameterValue.String}">
+                    </controls2:FastCellView>
+                </DataTemplate>
+            </helpers:FieldValueTemplateSelector.GenericTemplate>
+        </helpers:FieldValueTemplateSelector>
+    </UserControl.DataTemplates>
+    <ScrollViewer Grid.IsSharedSizeScope="True">
+        <StackPanel>
+            <ItemsPresenter Items="{Binding Columns, Mode=OneTime}">
+                <ItemsPresenter.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsPresenter.ItemsPanel>
+                <ItemsPresenter.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="50" SharedSizeGroup="{Binding DatabaseName, Mode=OneTime}" />
+                                <ColumnDefinition Width="2" />
+                                <ColumnDefinition Width="10" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock Text="{Binding Name}" />
+                            <GridSplitter Grid.Column="1" />
+                            <Panel Grid.Column="2" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsPresenter.ItemTemplate>
+            </ItemsPresenter>
+            <ItemsPresenter Items="{Binding Rows, Mode=OneTime}">
+                <ItemsPresenter.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <controls1:GroupingHeader GroupName="{Binding GroupName, Mode=OneTime}" />
+                            <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}">
+                                <controls:AlternatingItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <Panel Classes="alternating">
+                                            <ItemsPresenter Items="{Binding Cells, Mode=OneTime}">
+                                                <ItemsPresenter.ItemsPanel>
+                                                    <ItemsPanelTemplate>
+                                                        <StackPanel Orientation="Horizontal" />
+                                                    </ItemsPanelTemplate>
+                                                </ItemsPresenter.ItemsPanel>
+                                                <ItemsPresenter.ItemTemplate>
+                                                    <DataTemplate>
+                                                        <Grid>
+                                                            <Grid.ColumnDefinitions>
+                                                                <ColumnDefinition SharedSizeGroup="{Binding ColumnName, Mode=OneTime}"></ColumnDefinition>
+                                                                <ColumnDefinition Width="12" />
+                                                            </Grid.ColumnDefinitions>
+                                                            <ContentPresenter Content="{Binding ., Mode=OneTime}">
+                                                                
+                                                            </ContentPresenter>
+                                                            <Panel Grid.Column="1"/>
+                                                        </Grid>
+                                                    </DataTemplate>
+                                                </ItemsPresenter.ItemTemplate>
+                                            </ItemsPresenter>
+                                        </Panel>
+                                    </DataTemplate>
+                                </controls:AlternatingItemsControl.ItemTemplate>
+                            </controls:AlternatingItemsControl>
+                        </StackPanel>
+                    </DataTemplate>
+                </ItemsPresenter.ItemTemplate>
+            </ItemsPresenter>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

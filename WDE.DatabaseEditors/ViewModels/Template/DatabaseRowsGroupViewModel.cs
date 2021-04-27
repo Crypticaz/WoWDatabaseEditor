@@ -4,7 +4,7 @@ using System.Linq;
 using DynamicData;
 using DynamicData.Binding;
 
-namespace WDE.DatabaseEditors.ViewModels
+namespace WDE.DatabaseEditors.ViewModels.Template
 {
     public class DatabaseRowsGroupViewModel : ObservableCollectionExtended<DatabaseRowViewModel>, IGrouping<(string, int), DatabaseRowViewModel>, IDisposable
     {
