@@ -13,14 +13,12 @@ namespace WDE.DatabaseEditors.Solution
     [AutoRegister]
     public class DatabaseTableSolutionItemSqlProvider : ISolutionItemSqlProvider<DatabaseTableSolutionItem>
     {
-        private readonly ITableDefinitionProvider tableDefinitionProvider;
         private readonly IDatabaseTableDataProvider tableDataProvider;
         private readonly IQueryGenerator queryGenerator;
 
-        public DatabaseTableSolutionItemSqlProvider(ITableDefinitionProvider tableDefinitionProvider,
-            IDatabaseTableDataProvider tableDataProvider, IQueryGenerator queryGenerator)
+        public DatabaseTableSolutionItemSqlProvider(IDatabaseTableDataProvider tableDataProvider, 
+            IQueryGenerator queryGenerator)
         {
-            this.tableDefinitionProvider = tableDefinitionProvider;
             this.tableDataProvider = tableDataProvider;
             this.queryGenerator = queryGenerator;
         }

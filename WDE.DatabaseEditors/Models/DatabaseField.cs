@@ -9,7 +9,7 @@ using WDE.DatabaseEditors.History;
 
 namespace WDE.DatabaseEditors.Models
 {
-    public class DatabaseField<T> : IDatabaseField, INotifyPropertyChanged
+    public class DatabaseField<T> : IDatabaseField
     {
         private readonly string columnName;
 

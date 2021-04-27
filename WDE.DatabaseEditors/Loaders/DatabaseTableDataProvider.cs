@@ -23,7 +23,6 @@ namespace WDE.DatabaseEditors.Loaders
         
         public DatabaseTableDataProvider(ITableDefinitionProvider tableDefinitionProvider, 
             IMySqlExecutor sqlExecutor,
-            IDatabaseFieldFactory tableFieldFactory, 
             IMessageBoxService messageBoxService,
             IDatabaseTableModelGenerator tableModelGenerator)
         {

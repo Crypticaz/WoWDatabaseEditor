@@ -1,7 +1,6 @@
 using WDE.Common.History;
 using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels;
-using WDE.DatabaseEditors.ViewModels.Template;
 
 namespace WDE.DatabaseEditors.History
 {

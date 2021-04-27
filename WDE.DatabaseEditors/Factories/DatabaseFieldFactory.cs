@@ -18,20 +18,13 @@ namespace WDE.DatabaseEditors.Factories
         
         public IDatabaseField CreateField(string columnName, IValueHolder valueHolder)
         {
-            if (valueHolder is ValueHolder<string> stringHolder)
+            return valueHolder switch
             {
-                return new DatabaseField<string>(columnName, stringHolder);
-            }
-            else if (valueHolder is ValueHolder<long> longHolder)
-            {
-                return new DatabaseField<long>(columnName, longHolder);
-            }
-            else if (valueHolder is ValueHolder<float> floatHolder)
-            {
-                return new DatabaseField<float>(columnName, floatHolder);
-            }
-
-            throw new Exception("unexpected type: " + valueHolder.GetType());
+                ValueHolder<string> stringHolder => new DatabaseField<string>(columnName, stringHolder),
+                ValueHolder<long> longHolder => new DatabaseField<long>(columnName, longHolder),
+                ValueHolder<float> floatHolder => new DatabaseField<float>(columnName, floatHolder),
+                _ => throw new Exception("unexpected type: " + valueHolder.GetType())
+            };
         }
     }
 }

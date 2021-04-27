@@ -10,8 +10,5 @@ namespace WDE.DatabaseEditors.Data.Interfaces
     {
         IDatabaseTableData? CreateDatabaseTable(DatabaseTableDefinitionJson tableDefinition, uint[] keys,
             IList<Dictionary<string, (System.Type type, object value)>> fieldsFromDb);
-
-        IDatabaseTableData? GetDatabaseMultiRecordTable(uint key, in DatabaseTableDefinitionJson tableDefinition, 
-            IList<Dictionary<string, object>> records);
     }
 }

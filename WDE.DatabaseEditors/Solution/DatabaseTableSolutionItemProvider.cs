@@ -11,7 +11,7 @@ using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Loaders;
 using WDE.Module.Attributes;
 
-namespace WDE.DatabaseEditors.Solution.Items
+namespace WDE.DatabaseEditors.Solution
 {
     [AutoRegister]
     public class DatabaseTableSolutionItemProviderProvider : ISolutionItemProviderProvider
@@ -52,8 +52,7 @@ namespace WDE.DatabaseEditors.Solution.Items
         private readonly IParameterFactory parameterFactory;
         private readonly DatabaseTableDefinitionJson definition;
         private readonly ImageUri itemIcon;
-
-
+        
         internal DatabaseTableSolutionItemProvider(DatabaseTableDefinitionJson definition,
             IDatabaseTableDataProvider tableDataProvider, 
             IItemFromListProvider itemFromListProvider, 

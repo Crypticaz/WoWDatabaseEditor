@@ -15,18 +15,15 @@ namespace WDE.DatabaseEditors.Data
     [AutoRegister]
     public class DatabaseTableModelGenerator : IDatabaseTableModelGenerator
     {
-        private readonly IDatabaseFieldFactory tableFieldFactory;
-        private readonly IDatabaseColumnFactory tableColumnFactory;
         private readonly IMessageBoxService messageBoxService;
+        private readonly IDatabaseFieldFactory databaseFieldFactory;
 
-        public DatabaseTableModelGenerator(IDatabaseFieldFactory tableFieldFactory, IDatabaseColumnFactory tableColumnFactory,
-            IMessageBoxService messageBoxService)
+        public DatabaseTableModelGenerator(IMessageBoxService messageBoxService,
+            IDatabaseFieldFactory databaseFieldFactory)
         {
-            this.tableFieldFactory = tableFieldFactory;
-            this.tableColumnFactory = tableColumnFactory;
             this.messageBoxService = messageBoxService;
+            this.databaseFieldFactory = databaseFieldFactory;
         }
-        
         
         private DatabaseEntity BuildEmptyEntity(DatabaseTableDefinitionJson definition, uint key)
         {
@@ -55,7 +52,7 @@ namespace WDE.DatabaseEditors.Data
                     valueHolder = new ValueHolder<string>("");
 
 
-                columns[column.DbColumnName] = tableFieldFactory.CreateField(column.DbColumnName, valueHolder);
+                columns[column.DbColumnName] = databaseFieldFactory.CreateField(column.DbColumnName, valueHolder);
             }
 
             return new DatabaseEntity(false, key, columns);
@@ -125,7 +122,7 @@ namespace WDE.DatabaseEditors.Data
                         }
                     }
                     
-                    columns[column.Key] = tableFieldFactory.CreateField(column.Key, valueHolder);
+                    columns[column.Key] = databaseFieldFactory.CreateField(column.Key, valueHolder);
                 }
                 if (key.HasValue)
                     rows.Add(new DatabaseEntity(true, key.Value, columns));
@@ -150,77 +147,6 @@ namespace WDE.DatabaseEditors.Data
             return null;
         }
 
-        public IDatabaseTableData? GetDatabaseMultiRecordTable(uint key, in DatabaseTableDefinitionJson tableDefinition,
-            IList<Dictionary<string, object>> records)
-        {
-            try
-            {
-                var columns = new List<IDatabaseColumn>(tableDefinition.Groups[0].Fields.Count);
-                var group = tableDefinition.Groups[0];
-                // prepare columns
-                for (int i = 0; i < group.Fields.Count; ++i)
-                {
-                    // ensure that each added field of table index column has value of key
-                    object? defaultValue = group.Fields[i].DbColumnName == tableDefinition.TablePrimaryKeyColumnName
-                        ? key
-                        : null;
-                    columns.Insert(i, tableColumnFactory.CreateColumn(group.Fields[i], defaultValue));
-                }
-
-                foreach (var record in records)
-                {
-                    for (int i = 0; i < group.Fields.Count; ++i)
-                    {
-                        var field = group.Fields[i];
-                        //columns[i].Fields.Add(tableFieldFactory.CreateField(in field, record[field.DbColumnName], columns[i]));
-                    }
-                }
-                
-                // make sure all columns have same amount of records
-                var firstColumnRecordsAmount = columns[0].Fields.Count;
-                foreach (var column in columns)
-                {
-                    if (column.Fields.Count != firstColumnRecordsAmount)
-                        throw new Exception("Detected row amount mismatch between table's columns!");
-                }
-
-                throw new Exception();
-                
-                //return new DatabaseMultiRecordTableData(tableDefinition.Name, tableDefinition.TableName,
-                //    tableDefinition.TablePrimaryKeyColumnName,
-                //    key.ToString(), columns);
-            }
-            catch (Exception e)
-            {
-                // in case of throw from DbTableFieldFactory
-                ShowLoadingError(e.Message);
-            }
-
-            return null;
-        }
-
-        private IDatabaseFieldsGroup CreateCategory(in DatabaseColumnsGroupJson groupDefinition, 
-            Dictionary<string, object> fieldsFromDb)
-        {
-            var fields = new List<IDatabaseField>(groupDefinition.Fields.Count);
-            IObservable<bool>? showGroup = null;
-            foreach (var column in groupDefinition.Fields)
-            {
-                //var field = tableFieldFactory.CreateField(in column, fieldsFromDb[column.DbColumnName]);
-                //fields.Add(field);
-            }
-            
-            /*if (groupDefinition.ShowIf.HasValue && 
-                groupDefinition.ShowIf.Value.ColumnName == column.DbColumnName &&
-                field is DatabaseField<long> longField)
-            {
-                int showIfValue = groupDefinition.ShowIf.Value.Value;
-                showGroup = longField.Parameter.ToObservable(p => p.Value).Select(val => val == showIfValue);
-            }*/
-            
-            return new DatabaseFieldsGroup(groupDefinition.Name, fields, showGroup);
-        }
-        
         private void ShowLoadingError(string msg)
         {
             messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
