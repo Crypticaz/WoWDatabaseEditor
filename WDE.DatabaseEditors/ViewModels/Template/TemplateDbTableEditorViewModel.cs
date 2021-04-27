@@ -33,7 +33,7 @@ using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels.Template
 {
-    public class TemplateDbTableEditorViewModel : ObservableBase, ISolutionItemDocument
+    public class TemplateDbTableEditorViewModel : ViewModelBase, ISolutionItemDocument
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -333,7 +333,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return ForceRemoveEntity(entity);
         }
 
-        public bool ForceRemoveEntity(DatabaseEntity entity)
+        public override bool ForceRemoveEntity(DatabaseEntity entity)
         {
             var indexOfEntity = Entities.IndexOf(entity);
             if (indexOfEntity == -1)
@@ -354,7 +354,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return ForceInsertEntity(entity, Entities.Count);
         }
 
-        public bool ForceInsertEntity(DatabaseEntity entity, int index)
+        public override bool ForceInsertEntity(DatabaseEntity entity, int index)
         {
             Dictionary<string, IObservable<bool>?> groupVisibility = new();
             

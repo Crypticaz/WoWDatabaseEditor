@@ -31,7 +31,7 @@ using WDE.MVVM;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class MultiRowDbTableEditorViewModel : ObservableBase, ISolutionItemDocument
+    public class MultiRowDbTableEditorViewModel : ViewModelBase, ISolutionItemDocument
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
@@ -159,26 +159,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return;
             
             view.ParameterValue.Revert();
-            
-            if (!view.ParentEntity.ExistInDatabase)
-                return;
-            
-            if (!mySqlExecutor.IsConnected)
-                return;
-
-            if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                .SetTitle("Reverting")
-                .SetMainInstruction("Do you want to revert field in the database?")
-                .SetContent(
-                    "Reverted field will become unmodified field and unmodified fields are not generated in query. Therefore if you want to revert the field in the database, it can be done now.\n\nDo you want to revert the field in the database now (this will execute query)?")
-                .SetIcon(MessageBoxIcon.Information)
-                .WithYesButton(true)
-                .WithNoButton(false)
-                .Build()))
-                return;
-
-            var query = queryGenerator.GenerateUpdateFieldQuery(tableDefinition, view.ParentEntity, view.TableField);
-            await mySqlExecutor.ExecuteSql(query);
         }
 
         private void RemoveTemplate(DatabaseCellViewModel? view)
@@ -291,27 +271,17 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
-            if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                .SetTitle("Delete entity")
-                .SetMainInstruction($"Do you want to delete entity with key {entity.Key} from the editor?")
-                .SetContent(
-                    "It will be removed only from the project editor, it will not be removed from the database.")
-                .WithYesButton(true)
-                .WithNoButton(false).Build()))
-                return false;
-
             return ForceRemoveEntity(entity);
         }
 
-        public bool ForceRemoveEntity(DatabaseEntity entity)
+        public override bool ForceRemoveEntity(DatabaseEntity entity)
         {
             var indexOfEntity = Entities.IndexOf(entity);
             if (indexOfEntity == -1)
                 return false;
             
             Entities.RemoveAt(indexOfEntity);
-            foreach (var row in rows.Items)
-                row.Cells.RemoveAt(indexOfEntity);
+            rows.RemoveAt(indexOfEntity);
 
             return true;
         }
@@ -321,11 +291,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             return ForceInsertEntity(entity, Entities.Count);
         }
 
-        public bool ForceInsertEntity(DatabaseEntity entity, int index)
+        public override bool ForceInsertEntity(DatabaseEntity entity, int index)
         {
             var name = parameterFactory.Factory(tableDefinition.Picker).ToString(entity.Key);
             var row = new DatabaseEntityViewModel(entity, name);
             
+            int columnIndex = 0;
             foreach (var column in columns)
             {
                 var cell = entity.GetCell(column.DbColumnName);
@@ -346,12 +317,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     parameterValue = new ParameterValue<float>(floatParameter.Current, floatParameter.Original, FloatParameter.Instance);
                 }
 
-                var cellViewModel = AutoDispose(new DatabaseCellViewModel(column, row, entity, cell, parameterValue));
+                var cellViewModel = AutoDispose(new DatabaseCellViewModel(columnIndex, column, row, entity, cell, parameterValue));
                 row.Cells.Add(cellViewModel);
+                columnIndex++;
             }
 
             Entities.Insert(index, entity);
-            rows.Add(row);
+            rows.Insert(index, row);
             return true;
         }
 

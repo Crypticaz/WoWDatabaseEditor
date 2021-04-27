@@ -15,16 +15,20 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public bool IsVisible { get; private set; } = true;
         public bool IsModified { get; private set; }
         public string? OriginalValueTooltip { get; private set; }
-        public bool CanBeNull => true;//Parent.CanBeNull;
-        public bool IsReadOnly => false;
+        public bool CanBeNull { get; }
+        public bool IsReadOnly { get; }
         public bool CanBeSetToNull => CanBeNull && !IsReadOnly;
         public bool CanBeReverted => !IsReadOnly;
+        public int ColumnIndex { get; }
         
         public string ColumnName { get; }
 
-        public DatabaseCellViewModel(DbEditorTableGroupFieldJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue)
+        public DatabaseCellViewModel(int columnIndex, DbEditorTableGroupFieldJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue)
         {
             Link(tableField, tf => tf.IsModified, () => IsModified);
+            ColumnIndex = columnIndex * 2;
+            CanBeNull = columnDefinition.CanBeNull;
+            IsReadOnly = columnDefinition.IsReadOnly;
             ColumnName = columnDefinition.DbColumnName;
             ParentEntity = parentEntity;
             Parent = parent;

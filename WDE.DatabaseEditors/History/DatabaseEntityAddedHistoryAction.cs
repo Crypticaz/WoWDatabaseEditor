@@ -9,10 +9,10 @@ namespace WDE.DatabaseEditors.History
     {
         private readonly DatabaseEntity entity;
         private readonly int index;
-        private readonly TemplateDbTableEditorViewModel viewModel;
+        private readonly ViewModelBase viewModel;
 
         public DatabaseEntityAddedHistoryAction(DatabaseEntity entity, int index,
-            TemplateDbTableEditorViewModel viewModel)
+            ViewModelBase viewModel)
         {
             this.entity = entity;
             this.index = index;
@@ -39,10 +39,10 @@ namespace WDE.DatabaseEditors.History
     {
         private readonly DatabaseEntity entity;
         private readonly int index;
-        private readonly TemplateDbTableEditorViewModel viewModel;
+        private readonly ViewModelBase viewModel;
 
         public DatabaseEntityRemovedHistoryAction(DatabaseEntity entity, int index,
-            TemplateDbTableEditorViewModel viewModel)
+            ViewModelBase viewModel)
         {
             this.entity = entity;
             this.index = index;

@@ -12,6 +12,7 @@
                 <Panel Background="Transparent" Name="PART_Panel">
                     <TextBlock Name="PART_text"
                                Background="Transparent" 
+                               Padding="16,0,0,0"
                                Text="{TemplateBinding StringValue}" 
                                FontWeight="{TemplateBinding FontWeight}"
                                VerticalAlignment="Center" />
