@@ -60,34 +60,35 @@ namespace WDE.DatabaseEditors.Loaders
             if (definition == null)
                 return null;
             
-            var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
             IList<Dictionary<string, (Type, object)>>? result = null;
 
-            try
+            if (keys.Length > 0)
             {
-                result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
-            }
-            catch (IMySqlExecutor.CannotConnectToDatabaseException e)
-            {
-            }
-            catch (Exception e)
-            {
-                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                    .SetTitle("Database error")
-                    .SetMainInstruction(
-                        "Unable to execute SQL query. Most likely your database is incompatible with provided database schema, if you think this is a bug, report it via Help -> Report Bug")
-                    .SetContent(e.ToString())
-                    .SetIcon(MessageBoxIcon.Error)
-                    .WithOkButton(false)
-                    .Build());
-                return null;
+                var sqlStatement = BuildSQLQueryFromTableDefinition(definition, keys);
+
+                try
+                {
+                    result = await sqlExecutor.ExecuteSelectSql(sqlStatement);
+                }
+                catch (IMySqlExecutor.CannotConnectToDatabaseException e)
+                {
+                }
+                catch (Exception e)
+                {
+                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                        .SetTitle("Database error")
+                        .SetMainInstruction(
+                            "Unable to execute SQL query. Most likely your database is incompatible with provided database schema, if you think this is a bug, report it via Help -> Report Bug")
+                        .SetContent(e.ToString())
+                        .SetIcon(MessageBoxIcon.Error)
+                        .WithOkButton(false)
+                        .Build());
+                    return null;
+                }
             }
 
             if (result == null)
                 result = new List<Dictionary<string, (Type, object)>>();
-
-            //if (definition.IsMultiRecord)
-            //    return tableModelGenerator.GetDatabaseMultiRecordTable(key, definition, result);
 
             return tableModelGenerator.CreateDatabaseTable(definition, keys, result);
         }

@@ -328,6 +328,8 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return true;
         }
 
+        protected override ICollection<uint> GenerateKeys() => Entities.Select(e => e.Key).ToList();
+
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
             Rows.Clear();

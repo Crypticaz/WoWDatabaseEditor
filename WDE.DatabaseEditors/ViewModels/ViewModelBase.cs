@@ -1,3 +1,5 @@
+using System.Collections;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Threading.Tasks;
@@ -74,6 +76,7 @@ namespace WDE.DatabaseEditors.ViewModels
         public abstract bool ForceRemoveEntity(DatabaseEntity entity);
         public abstract bool ForceInsertEntity(DatabaseEntity entity, int index);
 
+        protected abstract ICollection<uint> GenerateKeys();
         protected abstract Task InternalLoadData(DatabaseTableData data);
         protected abstract void UpdateSolutionItem();
 
@@ -91,7 +94,7 @@ namespace WDE.DatabaseEditors.ViewModels
             if (!SolutionItem.Equals(dbEditItem)) 
                 return;
             
-            args.Sql = queryGenerator.GenerateQuery(solutionItem, new DatabaseTableData(tableDefinition, Entities));
+            args.Sql = queryGenerator.GenerateQuery(GenerateKeys(), new DatabaseTableData(tableDefinition, Entities));
         }
 
         private void SaveSolutionItem()

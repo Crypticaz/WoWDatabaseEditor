@@ -30,6 +30,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly IParameterFactory parameterFactory;
+        private readonly IMySqlExecutor mySqlExecutor;
+        private readonly IQueryGenerator queryGenerator;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         public ReadOnlyObservableCollection<DatabaseEntitiesGroupViewModel> Rows { get; }
@@ -37,6 +39,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         private IList<DbEditorTableGroupFieldJson> columns = new List<DbEditorTableGroupFieldJson>();
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
+
+        private HashSet<uint> keys = new();
 
         public AsyncAutoCommand AddNewCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
@@ -59,7 +63,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.tableDataProvider = tableDataProvider;
             this.messageBoxService = messageBoxService;
             this.parameterFactory = parameterFactory;
-            
+            this.mySqlExecutor = mySqlExecutor;
+            this.queryGenerator = queryGenerator;
+
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
 
             var comparer = Comparer<DatabaseEntitiesGroupViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder));
@@ -171,6 +177,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 valueHolder.Value = result.Value; 
         }
 
+        protected override ICollection<uint> GenerateKeys() => keys;
+
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
             rows.Clear();
@@ -184,12 +192,45 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         protected override void UpdateSolutionItem()
         {
-            solutionItem.Entries = Entities.Select(e => e.Key).Distinct().Select(e =>
+            solutionItem.Entries = keys.Select(e =>
                 new SolutionItemDatabaseEntity(e, false)).ToList();
         }
 
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
+            var itemsWithSameKey = Entities.Count(e => e.Key == entity.Key);
+
+            if (itemsWithSameKey == 1)
+            {
+                if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Removing entity")
+                    .SetMainInstruction($"Do you want to delete the key {entity.Key} from solution?")
+                    .SetContent(
+                        $"This entity is the last row with key {entity.Key}. You have to choose if you want to delete the key from solution as well.\n\nIf you delete it from the solution, DELETE FROM... will no longer be generated for this key.")
+                    .WithYesButton(true)
+                    .WithNoButton(false)
+                    .SetIcon(MessageBoxIcon.Information)
+                    .Build()))
+                {
+                    if (mySqlExecutor.IsConnected)
+                    {
+                        if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                            .SetTitle("Execute DELETE query?")
+                            .SetMainInstruction("Do you want to execute DELETE query now?")
+                            .SetContent(
+                                "You have decided to remove the item from solution, therefore DELETE FROM query will not be generated for this key anymore, you we can execute DELETE with that key for that last time.")
+                            .WithYesButton(true)
+                            .WithNoButton(false)
+                            .Build()))
+                        {
+                            await mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
+                        }
+                    }
+
+                    keys.Remove(entity.Key);
+                }
+            }
+            
             return ForceRemoveEntity(entity);
         }
 
@@ -242,6 +283,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
 
             Entities.Insert(index, entity);
+            keys.Add(entity.Key);
             rows.Insert(index, row);
             return true;
         }

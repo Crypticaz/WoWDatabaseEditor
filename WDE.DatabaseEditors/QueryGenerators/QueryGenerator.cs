@@ -20,18 +20,25 @@ namespace WDE.DatabaseEditors.QueryGenerators
             this.tableDefinitionProvider = tableDefinitionProvider;
         }
         
-        public string GenerateQuery(DatabaseTableSolutionItem solution, IDatabaseTableData tableData)
+        public string GenerateQuery(ICollection<uint> keys, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.IsMultiRecord)
-                return GenerateInsertQuery(solution, tableData);
+                return GenerateInsertQuery(keys, tableData);
             return GenerateUpdateQuery(tableData);
         }
 
-        private string GenerateInsertQuery(DatabaseTableSolutionItem solution, IDatabaseTableData tableData)
+        public string GenerateDeleteQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity)
         {
+            return $"DELETE FROM {table.TableName} WHERE {table.TablePrimaryKeyColumnName} = {entity.Key};";
+        }
+ 
+        private string GenerateInsertQuery(ICollection<uint> keys, IDatabaseTableData tableData)
+        {
+            if (keys.Count == 0)
+                return "";
+
             StringBuilder query = new();
-            var keys = solution.Entries.Select(entity => entity.Key).Distinct();
-            var keysString = string.Join(", ", keys);
+            var keysString = string.Join(", ",  keys.Distinct());
 
             query.AppendLine(
                 $"DELETE FROM {tableData.TableDefinition.TableName} WHERE {tableData.TableDefinition.TablePrimaryKeyColumnName} IN ({keysString});");
@@ -70,7 +77,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
             return
                 $"UPDATE {table.TableName} SET `{field.FieldName}` = {field.ToQueryString()} WHERE `{primaryKeyColumn}` = {entity.Key};";
         }
-        
+
         private string GenerateUpdateQuery(IDatabaseTableData tableData)
         {
             StringBuilder query = new();
@@ -137,11 +144,5 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
             return query.ToString();
         }
-    }
-    
-    public interface IQueryGenerator
-    {
-        public string GenerateQuery(DatabaseTableSolutionItem solution, IDatabaseTableData tableData);
-        public string GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity, IDatabaseField field);
     }
 }
