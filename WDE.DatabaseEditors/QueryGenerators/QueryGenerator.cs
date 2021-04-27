@@ -21,7 +21,41 @@ namespace WDE.DatabaseEditors.QueryGenerators
         
         public string GenerateQuery(IDatabaseTableData tableData)
         {
+            if (tableData.TableDefinition.IsMultiRecord)
+                return GenerateInsertQuery(tableData);
             return GenerateUpdateQuery(tableData);
+        }
+
+        private string GenerateInsertQuery(IDatabaseTableData tableData)
+        {
+            StringBuilder query = new();
+            var keys = tableData.Entities.Select(entity => entity.Key).Distinct();
+            var keysString = string.Join(", ", keys);
+
+            query.AppendLine(
+                $"DELETE FROM {tableData.TableDefinition.TableName} WHERE {tableData.TableDefinition.TablePrimaryKeyColumnName} IN ({keysString});");
+
+            if (tableData.Entities.Count == 0)
+                return query.ToString();
+
+            var columns = tableData.Entities[0].Fields.Select(f => $"`{f.FieldName}`");
+            var columnsString = string.Join(", ", columns);
+
+            query.AppendLine($"INSERT INTO {tableData.TableDefinition.TableName} ({columnsString}) VALUES");
+
+            List<string> inserts = new List<string>(tableData.Entities.Count);
+            foreach (var entity in tableData.Entities)
+            {
+                var cells = entity.Fields.Select(f => f.ToQueryString());
+                var cellStrings = string.Join(", ", cells);
+                inserts.Add($"({cellStrings})");
+            }
+
+            query.Append(string.Join(",\n", inserts));
+            
+            query.AppendLine(";");
+            
+            return query.ToString();
         }
 
         public string GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity,

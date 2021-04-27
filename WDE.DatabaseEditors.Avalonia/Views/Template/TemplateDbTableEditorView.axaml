@@ -20,7 +20,7 @@
         <helpers:FieldValueTemplateSelector x:Key="FieldValueTemplateSelector">
             <helpers:FieldValueTemplateSelector.BoolTemplate>
                 <DataTemplate>
-                    <controls:FastBoolCellView Width="150" Height="24" Margin="0,0,10,0"
+                    <controls:FastBoolCellView Width="300" Margin="0,0,10,0"
                         ToolTip.Tip="{Binding OriginalValueTooltip}"
                         Focusable="False"
                         IsActive="{Binding IsVisible}"
@@ -35,7 +35,7 @@
             </helpers:FieldValueTemplateSelector.BoolTemplate>
             <helpers:FieldValueTemplateSelector.GenericTemplate>
                 <DataTemplate>
-                    <controls:FastCellView Width="150" Height="24" Margin="0,0,10,0"
+                    <controls:FastCellView Width="300" Margin="0,0,10,0"
                         ToolTip.Tip="{Binding OriginalValueTooltip}"
                         Focusable="False"
                         IsActive="{Binding IsVisible}"
@@ -55,7 +55,7 @@
         </helpers:FieldValueTemplateSelector>
         
         <DataTemplate x:Key="RowHeaderTemplate">
-            <TextBlock Width="150" 
+            <TextBlock Width="300" 
                        Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
                        TextAlignment="Center" 
                        VerticalAlignment="Center"
@@ -63,10 +63,10 @@
             </TextBlock>
         </DataTemplate>
         <DataTemplate x:Key="RowTemplate">
-            <DockPanel LastChildFill="True" Classes="alternating">
-                <TextBlock DockPanel.Dock="Top" Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
-                <controls1:AlternatingItemsControl Items="{Binding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" >
-                </controls1:AlternatingItemsControl>
+            <DockPanel LastChildFill="True" Classes="alternating" Height="24">
+                <TextBlock Text="{Binding Name, Mode=OneTime}" Width="150" VerticalAlignment="Center" Padding="10,0,10,0" />
+                <ItemsPresenter Items="{Binding Cells}" ItemTemplate="{StaticResource FieldValueTemplateSelector}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                </ItemsPresenter>
             </DockPanel>
         </DataTemplate>
     </UserControl.Resources>
@@ -100,23 +100,26 @@
             <ScrollViewer Grid.Row="1">
                 <StackPanel>
                     <ItemsPresenter Focusable="False" Items="{Binding FilteredRows, Mode=OneTime}" Margin="0, 0, 0, 20">
-                        <ItemsPresenter.ItemsPanel>
-                            <ItemsPanelTemplate>
-                                <StackPanel>
-                                    <StackPanel.Orientation>Horizontal</StackPanel.Orientation>
-                                </StackPanel>
-                            </ItemsPanelTemplate>
-                        </ItemsPresenter.ItemsPanel>
                         <ItemsPresenter.ItemTemplate>
                             <DataTemplate>
-                                <ItemsControl ItemsPanel="{StaticResource HorizontalStackPanelTemplate}" ItemTemplate="{StaticResource RowTemplate}" Focusable="False" Items="{Binding ., Mode=OneTime}">
-                                </ItemsControl>
+                                <StackPanel Orientation="Vertical" Margin="0, 10, 0, 0">
+                                    <Border Height="20" Background="{DynamicResource TreeViewItem.Header.Background.Special}">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Padding="10,0,0,0" 
+                                                       Text="{Binding GroupName, Mode=OneTime}" 
+                                                       Foreground="{DynamicResource TreeViewItem.Header.Foreground.Special}" 
+                                                       Width="150"
+                                                       VerticalAlignment="Center"/>
+                                            <ItemsControl ItemTemplate="{StaticResource RowHeaderTemplate}" Items="{Binding DataContext.Header, ElementName=rootWindow, Mode=OneTime}" ItemsPanel="{StaticResource HorizontalStackPanelTemplate}">
+                                            </ItemsControl>
+                                        </StackPanel>
+                                    </Border>
+                                    <controls1:AlternatingItemsControl ItemTemplate="{StaticResource RowTemplate}" Focusable="False" Items="{Binding ., Mode=OneTime}">
+                                    </controls1:AlternatingItemsControl>
+                                </StackPanel>
                             </DataTemplate>
                         </ItemsPresenter.ItemTemplate>
                     </ItemsPresenter>
-                    <DataGrid Items="{Binding FilteredRows, Mode=OneTime}">
-                        
-                    </DataGrid>
                 </StackPanel>
             </ScrollViewer>
         </Grid>

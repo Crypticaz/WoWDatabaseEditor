@@ -22,6 +22,26 @@
         <Style Selector="Panel.alternating.odd">
             <Setter Property="Background" Value="{DynamicResource TreeViewItem.Content.Background.Normal}" />
         </Style>
+        <Style Selector="Border.header">
+            <Setter Property="Height" Value="32" />
+            <Setter Property="Background" Value="{DynamicResource TextControlBackground}"/>
+            <Setter Property="BorderBrush" Value="{DynamicResource TextControlBorderBrush}"/>
+            <Setter Property="BorderThickness" Value="0,0,1,1" />
+        </Style>
+        <Style Selector="Border.header TextBlock">
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        </Style>
+        <Style Selector="GridSplitter">
+            <Setter Property="Template">
+                <ControlTemplate>
+                    <Border 
+                        BorderBrush="{TemplateBinding BorderBrush}"
+                        BorderThickness="{TemplateBinding BorderThickness}"
+                        Background="{DynamicResource TextControlBackground}"/>
+                </ControlTemplate>
+            </Setter>
+        </Style>
     </UserControl.Styles>
     <UserControl.DataTemplates>
         <helpers:FieldValueTemplateSelector>
@@ -71,16 +91,18 @@
                 </ItemsPresenter.ItemsPanel>
                 <ItemsPresenter.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="50" SharedSizeGroup="{Binding DatabaseName, Mode=OneTime}" />
-                                <ColumnDefinition Width="2" />
-                                <ColumnDefinition Width="10" />
-                            </Grid.ColumnDefinitions>
-                            <TextBlock Text="{Binding Name}" />
-                            <GridSplitter Grid.Column="1" />
-                            <Panel Grid.Column="2" />
-                        </Grid>
+                        <Border Classes="header">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="50" SharedSizeGroup="{Binding DatabaseName, Mode=OneTime}" />
+                                    <ColumnDefinition Width="2" />
+                                    <ColumnDefinition Width="10" />
+                                </Grid.ColumnDefinitions>
+                                <TextBlock Text="{Binding Name}" />
+                                <GridSplitter Grid.Column="1" />
+                                <Panel Grid.Column="2" />
+                            </Grid>
+                        </Border>
                     </DataTemplate>
                 </ItemsPresenter.ItemTemplate>
             </ItemsPresenter>
