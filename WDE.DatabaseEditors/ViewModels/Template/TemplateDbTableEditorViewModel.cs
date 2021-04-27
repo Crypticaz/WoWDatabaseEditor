@@ -33,51 +33,48 @@ using WDE.MVVM.Observable;
 
 namespace WDE.DatabaseEditors.ViewModels.Template
 {
-    public class TemplateDbTableEditorViewModel : ViewModelBase, ISolutionItemDocument
+    public class TemplateDbTableEditorViewModel : ViewModelBase
     {
         private readonly IItemFromListProvider itemFromListProvider;
         private readonly IMessageBoxService messageBoxService;
-        private readonly ISolutionManager solutionManager;
         private readonly IParameterFactory parameterFactory;
-        private readonly ISolutionTasksService solutionTasksService;
-        private readonly ISolutionItemNameRegistry solutionItemName;
         private readonly IMySqlExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
 
-        private readonly DatabaseTableSolutionItem solutionItem;
         private readonly IDatabaseTableDataProvider tableDataProvider;
+        
+        public ObservableCollection<string> Header { get; } = new();
+        public ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> FilteredRows { get; }
+        public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
+        public SourceList<DatabaseRowViewModel> Rows { get; } = new();
+        
+        public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
+        public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
+        public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
+        public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
+        private readonly Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
 
+        public AsyncAutoCommand AddNewCommand { get; }
+        
         public TemplateDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
-            IQueryGenerator queryGenerator)
+            IQueryGenerator queryGenerator) : base(history, solutionItem, solutionItemName, 
+            solutionManager, solutionTasksService, eventAggregator, 
+            queryGenerator, tableDataProvider, messageBoxService, taskRunner)
         {
-            SolutionItem = solutionItem;
             this.itemFromListProvider = itemFromListProvider;
-            this.solutionItem = solutionItem;
             this.tableDataProvider = tableDataProvider;
             this.messageBoxService = messageBoxService;
-            this.solutionManager = solutionManager;
             this.parameterFactory = parameterFactory;
-            this.solutionTasksService = solutionTasksService;
-            this.solutionItemName = solutionItemName;
             this.mySqlExecutor = mySqlExecutor;
             this.queryGenerator = queryGenerator;
-            History = history;
             tableDefinition = null!;
-            
-            IsLoading = true;
-            title = solutionItemName.GetName(solutionItem);
-            
-            taskRunner.ScheduleTask($"Loading {title}..", LoadTableDefinition);
 
-            undoCommand = new DelegateCommand(History.Undo, CanUndo);
-            redoCommand = new DelegateCommand(History.Redo, CanRedo);
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
-            Save = new DelegateCommand(SaveSolutionItem);
 
             CurrentFilter = FunctionalExtensions.Select(this.ToObservable(t => t.SearchText), FilterItem);
 
@@ -96,26 +93,20 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 }, b => throw b));
             FilteredRows = filteredFields;
 
-            AutoDispose(eventAggregator.GetEvent<EventRequestGenerateSql>()
-                .Subscribe(ExecuteSql));
-
             RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
             RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.IsModified);
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
+
+            ScheduleLoading();
         }
 
-        private void ExecuteSql(EventRequestGenerateSqlArgs args)
+        protected override void UpdateSolutionItem()
         {
-            if (args.Item is not DatabaseTableSolutionItem dbEditItem) 
-                return;
-            
-            if (!solutionItem.Equals(dbEditItem)) 
-                return;
-            
-            args.Sql = queryGenerator.GenerateQuery(new DatabaseTableData(tableDefinition, Entities));
+            solutionItem.Entries = Entities.Select(e =>
+                new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, GetOriginalFields(e))).ToList();
         }
-        
+
         private async Task AddNewEntity()
         {
             var parameter = parameterFactory.Factory(tableDefinition.Picker);
@@ -207,10 +198,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             var lower = text.ToLower();
             return item => item.Name.ToLower().Contains(lower);
         }
-
-        private bool CanRedo() => History.CanRedo;
-        private bool CanUndo() => History.CanUndo;
-
+        
         private bool ContainsEntity(DatabaseEntity entity)
         {
             foreach (var e in Entities)
@@ -235,64 +223,6 @@ namespace WDE.DatabaseEditors.ViewModels.Template
                 valueHolder.Value = result.Value; 
         }
 
-        private async Task LoadTableDefinition()
-        {
-            var data = await tableDataProvider.Load(solutionItem.DefinitionId, solutionItem.Entries.Select(e => e.Key).ToArray()) as DatabaseTableData;
-
-            if (data == null)
-            {
-                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Error!")
-                    .SetMainInstruction($"Editor failed to load data from database!")
-                    .SetIcon(MessageBoxIcon.Error)
-                    .WithOkButton(true)
-                    .Build());
-                return;
-            }
-
-            solutionItem.UpdateEntitiesWithOriginalValues(data.Entities);
-            
-            {
-                Rows.Clear();
-                Entities.Clear();
-                Header.Clear();
-                groupVisibilityByName.Clear();
-                tableDefinition = data.TableDefinition;
-
-                int categoryIndex = 0;
-                int columnIndex = 0;
-
-                foreach (var group in tableDefinition.Groups)
-                {
-                    categoryIndex++;
-                    groupVisibilityByName[group.Name] = new ReactiveProperty<bool>(true);
-
-                    foreach (var column in group.Fields)
-                    {
-                        var row = new DatabaseRowViewModel(column, group, categoryIndex, columnIndex++);
-                        Rows.Add(row);
-                    }
-                }
-
-                await AsyncAddEntities(data.Entities);
-            }
-            
-
-            SetupHistory();
-            IsLoading = false;
-        }
-
-        private void SetupHistory()
-        {
-            var historyHandler = AutoDispose(new TemplateTableEditorHistoryHandler(this));
-            History.PropertyChanged += (_, _) =>
-            {
-                undoCommand.RaiseCanExecuteChanged();
-                redoCommand.RaiseCanExecuteChanged();
-                RaisePropertyChanged(nameof(IsModified));
-            };
-            History.AddHandler(historyHandler);
-        }
-
         private List<EntityOrigianlField>? GetOriginalFields(DatabaseEntity entity)
         {
             var modified = entity.Fields.Where(f => f.IsModified).ToList();
@@ -302,22 +232,6 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             return modified.Select(f => new EntityOrigianlField()
                 {ColumnName = f.FieldName, OriginalValue = f.OriginalValue}).ToList();
         }
-
-        private void SaveSolutionItem()
-        {
-            solutionItem.Entries = Entities.Select(e =>
-                new SolutionItemDatabaseEntity(e.Key, e.ExistInDatabase, GetOriginalFields(e))).ToList();
-            solutionManager.Refresh(solutionItem);
-            solutionTasksService.SaveSolutionToDatabaseTask(solutionItem);
-            History.MarkAsSaved();
-            Title = solutionItemName.GetName(solutionItem);
-        }
-        
-        public ObservableCollection<DatabaseEntity> Entities { get; } = new();
-        public ObservableCollection<string> Header { get; } = new();
-        public ReadOnlyObservableCollection<DatabaseRowsGroupViewModel> FilteredRows { get; }
-        public IObservable<Func<DatabaseRowViewModel, bool>> CurrentFilter { get; }
-        public SourceList<DatabaseRowViewModel> Rows { get; } = new();
 
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
@@ -413,8 +327,32 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             
             return true;
         }
-        
-        private DatabaseTableDefinitionJson tableDefinition;
+
+        protected override async Task InternalLoadData(DatabaseTableData data)
+        {
+            Rows.Clear();
+            Header.Clear();
+            groupVisibilityByName.Clear();
+
+            int categoryIndex = 0;
+            int columnIndex = 0;
+
+            foreach (var group in tableDefinition.Groups)
+            {
+                categoryIndex++;
+                groupVisibilityByName[group.Name] = new ReactiveProperty<bool>(true);
+
+                foreach (var column in group.Fields)
+                {
+                    var row = new DatabaseRowViewModel(column, group, categoryIndex, columnIndex++);
+                    Rows.Add(row);
+                }
+            }
+
+            await AsyncAddEntities(data.Entities);
+            
+            History.AddHandler(AutoDispose(new TemplateTableEditorHistoryHandler(this)));
+        }
 
         private async Task AsyncAddEntities(IList<DatabaseEntity> tableDataEntities)
         {
@@ -450,27 +388,10 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             }
         }
 
-        private Dictionary<string, ReactiveProperty<bool>> groupVisibilityByName = new();
-
         public IObservable<bool> GetGroupVisibility(string str)
         {
             return groupVisibilityByName[str];
         }
-        
-        private bool isLoading;
-        public bool IsLoading
-        {
-            get => isLoading;
-            internal set => SetProperty(ref isLoading, value);
-        }
-        
-        public AsyncAutoCommand AddNewCommand { get; }
-        public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
-        public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
-        public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
-        public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
-        private DelegateCommand undoCommand;
-        private DelegateCommand redoCommand;
         
         private string searchText = "";
         public string SearchText
@@ -478,24 +399,5 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             get => searchText;
             set => SetProperty(ref searchText, value);
         }
-
-        private string title;
-        public string Title
-        {
-            get => title;
-            set => SetProperty(ref title, value);
-        }
-        public ICommand Undo => undoCommand;
-        public ICommand Redo => redoCommand;
-        public ICommand Copy => AlwaysDisabledCommand.Command;
-        public ICommand Cut => AlwaysDisabledCommand.Command;
-        public ICommand Paste => AlwaysDisabledCommand.Command;
-        public ICommand Save { get; }
-        public IAsyncCommand? CloseCommand { get; set; } = null;
-        public bool CanClose { get; } = true;
-        public bool IsModified => !History.IsSaved;
-        public IHistoryManager History { get; }
-        public ISolutionItem SolutionItem { get; }
     }
-
 }

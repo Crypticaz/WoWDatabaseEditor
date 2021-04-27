@@ -4,6 +4,7 @@ using System.Text;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.Models;
+using WDE.DatabaseEditors.Solution;
 using WDE.Module.Attributes;
 
 namespace WDE.DatabaseEditors.QueryGenerators
@@ -19,17 +20,17 @@ namespace WDE.DatabaseEditors.QueryGenerators
             this.tableDefinitionProvider = tableDefinitionProvider;
         }
         
-        public string GenerateQuery(IDatabaseTableData tableData)
+        public string GenerateQuery(DatabaseTableSolutionItem solution, IDatabaseTableData tableData)
         {
             if (tableData.TableDefinition.IsMultiRecord)
-                return GenerateInsertQuery(tableData);
+                return GenerateInsertQuery(solution, tableData);
             return GenerateUpdateQuery(tableData);
         }
 
-        private string GenerateInsertQuery(IDatabaseTableData tableData)
+        private string GenerateInsertQuery(DatabaseTableSolutionItem solution, IDatabaseTableData tableData)
         {
             StringBuilder query = new();
-            var keys = tableData.Entities.Select(entity => entity.Key).Distinct();
+            var keys = solution.Entries.Select(entity => entity.Key).Distinct();
             var keysString = string.Join(", ", keys);
 
             query.AppendLine(
@@ -140,7 +141,7 @@ namespace WDE.DatabaseEditors.QueryGenerators
     
     public interface IQueryGenerator
     {
-        public string GenerateQuery(IDatabaseTableData tableData);
+        public string GenerateQuery(DatabaseTableSolutionItem solution, IDatabaseTableData tableData);
         public string GenerateUpdateFieldQuery(DatabaseTableDefinitionJson table, DatabaseEntity entity, IDatabaseField field);
     }
 }

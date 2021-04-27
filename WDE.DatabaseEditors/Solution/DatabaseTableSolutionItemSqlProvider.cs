@@ -33,7 +33,7 @@ namespace WDE.DatabaseEditors.Solution
                 return $"-- Unable to load data for {item} from the database";
 
             item.UpdateEntitiesWithOriginalValues(tableData.Entities);
-            return queryGenerator.GenerateQuery(tableData);
+            return queryGenerator.GenerateQuery(item, tableData);
         }
 
         private Task<IDatabaseTableData?> LoadTable(DatabaseTableSolutionItem item)
