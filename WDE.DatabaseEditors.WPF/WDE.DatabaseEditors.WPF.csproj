@@ -24,8 +24,4 @@
             <Version>7.2.0.1422</Version>
         </PackageReference>
     </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Views\MultiRow" />
-    </ItemGroup>
 </Project>
