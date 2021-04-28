@@ -10,6 +10,7 @@ namespace WDE.DatabaseEditors.Data
     [AutoRegister]
     public class TableDefinitionProvider : ITableDefinitionProvider
     {
+        private readonly Dictionary<string, DatabaseTableDefinitionJson> incompatibleDefinitions = new();
         private readonly Dictionary<string, DatabaseTableDefinitionJson> definitions = new();
         
         public TableDefinitionProvider(ITableDefinitionDeserializer serializationProvider,
@@ -38,12 +39,21 @@ namespace WDE.DatabaseEditors.Data
                         definition.ForeignTableByName[foreign.TableName] = foreign;
                     }
                 }
-                
+
                 if (definition.Compatibility.Contains(currentCoreVersion.Current.Tag))
                     definitions[definition.Id] = definition;
+                else
+                    incompatibleDefinitions[definition.Id] = definition;
             }
         }
 
+        public IEnumerable<string>? CoreCompatibility(string definitionId)
+        {
+            if (incompatibleDefinitions.TryGetValue(definitionId, out var definition))
+                return definition.Compatibility;
+            return null;
+        }
+        
         public DatabaseTableDefinitionJson? GetDefinition(string definitionId)
         {
             if (definitionId != null && definitions.TryGetValue(definitionId, out var definition))

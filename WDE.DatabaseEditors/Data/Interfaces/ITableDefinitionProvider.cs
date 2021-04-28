@@ -8,6 +8,7 @@ namespace WDE.DatabaseEditors.Data.Interfaces
     public interface ITableDefinitionProvider
     {
         DatabaseTableDefinitionJson? GetDefinition(string definitionId);
+        IEnumerable<string>? CoreCompatibility(string definitionId);
         IEnumerable<DatabaseTableDefinitionJson> Definitions { get; }
     }
 }
