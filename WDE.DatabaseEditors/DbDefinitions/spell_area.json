@@ -35,6 +35,7 @@
         {
           "name": "Quest start status",
           "db_column_name": "quest_start_status",
+          "default": 64,
           "value_type": "QuestStatusParameter"
         },
         {
@@ -45,12 +46,14 @@
         {
           "name": "Quest end status",
           "db_column_name": "quest_end_status",
+          "default": 11,
           "value_type": "QuestStatusParameter"
         },
         {
           "name": "Autocast",
           "db_column_name": "autocast",
-          "value_type": "BoolParameter"
+          "value_type": "BoolParameter",
+          "default": 1
         },
         {
           "name": "Aura condition",
@@ -65,11 +68,7 @@
         {
           "name": "Gender condition",
           "db_column_name": "gender",
-          "value_type": "GenderParameter"
-        },
-        {
-          "name": "Gender condition",
-          "db_column_name": "gender",
+          "default": 2,
           "value_type": "GenderParameter"
         }
       ]

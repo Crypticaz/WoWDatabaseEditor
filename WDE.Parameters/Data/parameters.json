@@ -2260,4 +2260,15 @@
 			"64": {"name": "rewarded", "description": "Player handed quest in and this is sort of a post-quest interaction"}
 		}
 	},
+	"CreatureTextTypeParameter": {
+		"name": "Creature text type",
+		"values": {
+			"12": {"name": "Say"},
+			"14": {"name": "Yell"},
+			"15": {"name": "Whisper"},
+			"16": {"name": "Emote"},
+			"41": {"name": "Boss emote"},
+			"42": {"name": "Boss whisper"}
+		}
+	}
 }

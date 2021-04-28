@@ -25,7 +25,7 @@ namespace WDE.DatabaseEditors.Data
             this.databaseFieldFactory = databaseFieldFactory;
         }
         
-        private DatabaseEntity BuildEmptyEntity(DatabaseTableDefinitionJson definition, uint key)
+        public DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson definition, uint key)
         {
             Dictionary<string, IDatabaseField> columns = new();
             
@@ -33,12 +33,12 @@ namespace WDE.DatabaseEditors.Data
                 .Distinct(
                     EqualityComparerFactory.Create<DbEditorTableGroupFieldJson>(
                         f => f.DbColumnName.GetHashCode(),
-                        (a, b) => a.DbColumnName.Equals(b.DbColumnName))))
+                        (a, b) => a!.DbColumnName.Equals(b!.DbColumnName))))
             {
                 IValueHolder valueHolder;
                 if (column.ValueType == "float")
                 {
-                    valueHolder = new ValueHolder<float>(0.0f);
+                    valueHolder = new ValueHolder<float>(column.Default is float f ? f : 0.0f);
                 }
                 else if (column.ValueType.EndsWith("Parameter") || column.ValueType == "int" ||
                          column.ValueType == "uint")
@@ -46,10 +46,10 @@ namespace WDE.DatabaseEditors.Data
                     if (column.DbColumnName == definition.TablePrimaryKeyColumnName)
                         valueHolder = new ValueHolder<long>(key);
                     else
-                        valueHolder = new ValueHolder<long>(0);
+                        valueHolder = new ValueHolder<long>(column.Default is long f ? f : 0);
                 }
                 else
-                    valueHolder = new ValueHolder<string>("");
+                    valueHolder = new ValueHolder<string>(column.Default is string f ? f : "");
 
 
                 columns[column.DbColumnName] = databaseFieldFactory.CreateField(column.DbColumnName, valueHolder);
@@ -133,7 +133,7 @@ namespace WDE.DatabaseEditors.Data
                 foreach (var key in keys)
                 {
                     if (!providedKeys.Contains(key))
-                        rows.Add(BuildEmptyEntity(tableDefinition, key));
+                        rows.Add(CreateEmptyEntity(tableDefinition, key));
                 }   
             }
 

@@ -10,5 +10,7 @@ namespace WDE.DatabaseEditors.Data.Interfaces
     {
         IDatabaseTableData? CreateDatabaseTable(DatabaseTableDefinitionJson tableDefinition, uint[] keys,
             IList<Dictionary<string, (System.Type type, object value)>> fieldsFromDb);
+
+        DatabaseEntity CreateEmptyEntity(DatabaseTableDefinitionJson tableDefinitionJson, uint key);
     }
 }

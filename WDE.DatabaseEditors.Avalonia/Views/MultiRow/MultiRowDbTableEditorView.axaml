@@ -100,13 +100,17 @@
                     <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{Binding Columns, Mode=OneTime}" />
                 </Border>
             </ScrollViewer>
-            <ScrollViewer  HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Name="other" >
+            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Name="other" >
             <ItemsPresenter Items="{Binding Rows, Mode=OneTime}">
                 <ItemsPresenter.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
-                            <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}" />
-                            <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}">
+                            <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}">
+                                <controls1:GroupingHeader.CustomContent>
+                                    <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRow, Mode=OneTime}" CommandParameter="{Binding ., Mode=OneTime}">+</Button>
+                                </controls1:GroupingHeader.CustomContent>
+                            </controls1:GroupingHeader>
+                            <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}" MinHeight="20">
                                 <controls:AlternatingItemsControl.ItemTemplate>
                                     <DataTemplate>
                                         <Panel Classes="alternating">

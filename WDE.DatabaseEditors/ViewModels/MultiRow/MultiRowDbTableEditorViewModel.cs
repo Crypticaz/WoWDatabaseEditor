@@ -16,6 +16,7 @@ using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
 using WDE.Common.Tasks;
 using WDE.Common.Utils;
+using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
 using WDE.DatabaseEditors.History;
 using WDE.DatabaseEditors.Loaders;
@@ -32,6 +33,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IParameterFactory parameterFactory;
         private readonly IMySqlExecutor mySqlExecutor;
         private readonly IQueryGenerator queryGenerator;
+        private readonly IDatabaseTableModelGenerator modelGenerator;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
         private Dictionary<uint, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
@@ -39,6 +41,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         private IList<DbEditorTableGroupFieldJson> columns = new List<DbEditorTableGroupFieldJson>();
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
+        private DbEditorTableGroupFieldJson? autoIncrementColumn;
 
         private HashSet<uint> keys = new();
 
@@ -47,6 +50,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> DuplicateCommand { get; }
+        public DelegateCommand<DatabaseEntitiesGroupViewModel> AddRowCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
 
         public event Action<DatabaseEntity>? OnDeleteQuery;
@@ -57,7 +61,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             IEventAggregator eventAggregator, ISolutionManager solutionManager, 
             IParameterFactory parameterFactory, ISolutionTasksService solutionTasksService,
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
-            IQueryGenerator queryGenerator) : base(history, solutionItem, solutionItemName, 
+            IQueryGenerator queryGenerator, IDatabaseTableModelGenerator modelGenerator) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
             queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory)
         {
@@ -68,15 +72,38 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.parameterFactory = parameterFactory;
             this.mySqlExecutor = mySqlExecutor;
             this.queryGenerator = queryGenerator;
+            this.modelGenerator = modelGenerator;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
             RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
             RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.TableField.IsModified);
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             DuplicateCommand = new DelegateCommand<DatabaseCellViewModel?>(Duplicate, vm => vm != null);
+            AddRowCommand = new DelegateCommand<DatabaseEntitiesGroupViewModel>(AddRow);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
             
             ScheduleLoading();
+        }
+
+        private void AddRow(DatabaseEntitiesGroupViewModel group)
+        {
+            var freshEntity = modelGenerator.CreateEmptyEntity(tableDefinition, group.Key);
+            if (autoIncrementColumn != null)
+            {
+                long max = 0;
+                
+                if (byEntryGroups[group.Key].Count > 0)
+                    max = 1 + byEntryGroups[group.Key].Max(t =>
+                    {
+                        if (t.Entity.GetCell(autoIncrementColumn.DbColumnName) is DatabaseField<long> lField)
+                            return lField.Current.Value;
+                        return 0L;
+                    });
+                
+                if (freshEntity.GetCell(autoIncrementColumn.DbColumnName) is DatabaseField<long> lField)
+                    lField.Current.Value = max;
+            }
+            ForceInsertEntity(freshEntity, Entities.Count);
         }
 
         private async Task AddNewEntity()
@@ -147,6 +174,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             Rows.Clear();
             columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
+            autoIncrementColumn = columns.FirstOrDefault(c => c.AutoIncrement);
             Columns.Clear();
             Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)));
                 

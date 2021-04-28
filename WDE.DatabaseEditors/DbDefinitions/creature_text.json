@@ -25,7 +25,8 @@
         {
           "name": "Group",
           "db_column_name": "GroupID",
-          "value_type": "uint"
+          "value_type": "uint",
+          "autoincrement": true
         },
         {
           "name": "Id",
@@ -35,13 +36,13 @@
         {
           "name": "Text",
           "db_column_name": "Text",
-          "value_type": "uint"
+          "value_type": "string"
         },
         {
           "name": "Type",
           "db_column_name": "Type",
           "default": 12,
-          "value_type": "uint"
+          "value_type": "CreatureTextTypeParameter"
         },
         {
           "name": "Language",
@@ -52,7 +53,7 @@
           "name": "Probability",
           "db_column_name": "Probability",
           "default": 100,
-          "value_type": "BoolParameter"
+          "value_type": "uint"
         },
         {
           "name": "Emote",

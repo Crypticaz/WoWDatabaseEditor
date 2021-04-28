@@ -9,7 +9,10 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate>
-                    <ContentPresenter Content="{TemplateBinding GroupName}" />
+                    <StackPanel Orientation="Horizontal">
+                        <ContentPresenter Content="{TemplateBinding CustomContent}" VerticalAlignment="Center" />
+                        <ContentPresenter Content="{TemplateBinding GroupName}"  VerticalAlignment="Center"/>
+                    </StackPanel>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
