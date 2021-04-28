@@ -64,7 +64,7 @@ namespace WDE.DatabaseEditors.ViewModels.Template
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
             IQueryGenerator queryGenerator) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
-            queryGenerator, tableDataProvider, messageBoxService, taskRunner)
+            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.tableDataProvider = tableDataProvider;

@@ -129,5 +129,10 @@ namespace WDE.DatabaseEditors.Models
         }
 
         public bool IsNull => value == null;
+
+        public ValueHolder<T> Clone()
+        {
+            return new ValueHolder<T>(Value);
+        }
     }
 }

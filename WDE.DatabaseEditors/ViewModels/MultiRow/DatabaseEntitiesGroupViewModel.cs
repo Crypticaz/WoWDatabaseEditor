@@ -3,26 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using DynamicData;
 using DynamicData.Binding;
+using WDE.DatabaseEditors.Models;
 
 namespace WDE.DatabaseEditors.ViewModels.MultiRow
 {
-    public class DatabaseEntitiesGroupViewModel : ObservableCollectionExtended<DatabaseEntityViewModel>, IGrouping<uint, DatabaseEntityViewModel>, IDisposable
+    public class DatabaseEntitiesGroupViewModel : ObservableCollectionExtended<DatabaseEntityViewModel>
     {
-        private readonly IDisposable disposable;
-            
-        public DatabaseEntitiesGroupViewModel(IGroup<DatabaseEntityViewModel, uint> group) 
+        public uint Key { get; }
+        public string Name { get; }
+
+        public DatabaseEntitiesGroupViewModel(uint key, string name)
         {
-            Key = group.GroupKey;
-            disposable = group.List
-                .Connect()
-//                .Sort(Comparer<DatabaseEntityViewModel>.Create((x, y) => x.Order.CompareTo(y.Order)))
-                .Bind(this)
-                .Subscribe();
+            Key = key;
+            Name = name;
         }
 
-        public uint GroupOrder => this[0].Key;
-        public string GroupName => this[0].Name;
-        public uint Key { get; private set; }
-        public void Dispose() => disposable.Dispose();
+        public void Remove(DatabaseEntity entity)
+        {
+            for (int i = 0; i < Count; ++i)
+            {
+                if (this[i].Entity == entity)
+                {
+                    RemoveAt(i);
+                    break;
+                }
+            }
+        }
     }
 }

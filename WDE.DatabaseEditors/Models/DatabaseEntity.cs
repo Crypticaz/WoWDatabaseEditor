@@ -35,5 +35,13 @@ namespace WDE.DatabaseEditors.Models
                 return cell;
             return null;
         }
+
+        public DatabaseEntity Clone()
+        {
+            var fields = new Dictionary<string, IDatabaseField>();
+            foreach (var field in Cells)
+                fields[field.Key] = field.Value.Clone();
+            return new DatabaseEntity(ExistInDatabase, Key, fields);
+        }
     }
 }

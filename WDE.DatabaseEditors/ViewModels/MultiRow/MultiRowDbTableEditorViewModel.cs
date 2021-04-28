@@ -34,8 +34,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private readonly IQueryGenerator queryGenerator;
         private readonly IDatabaseTableDataProvider tableDataProvider;
 
-        public ReadOnlyObservableCollection<DatabaseEntitiesGroupViewModel> Rows { get; }
-        public SourceList<DatabaseEntityViewModel> rows { get; } = new();
+        private Dictionary<uint, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
+        public ObservableCollection<DatabaseEntitiesGroupViewModel> Rows { get; } = new();
 
         private IList<DbEditorTableGroupFieldJson> columns = new List<DbEditorTableGroupFieldJson>();
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
@@ -46,6 +46,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public DelegateCommand<DatabaseCellViewModel?> RemoveTemplateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel?> RevertCommand { get; }
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
+        public DelegateCommand<DatabaseCellViewModel?> DuplicateCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
 
         public event Action<DatabaseEntity>? OnDeleteQuery;
@@ -58,7 +59,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             ISolutionItemNameRegistry solutionItemName, IMySqlExecutor mySqlExecutor,
             IQueryGenerator queryGenerator) : base(history, solutionItem, solutionItemName, 
             solutionManager, solutionTasksService, eventAggregator, 
-            queryGenerator, tableDataProvider, messageBoxService, taskRunner)
+            queryGenerator, tableDataProvider, messageBoxService, taskRunner, parameterFactory)
         {
             this.itemFromListProvider = itemFromListProvider;
             this.solutionItem = solutionItem;
@@ -69,27 +70,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             this.queryGenerator = queryGenerator;
 
             OpenParameterWindow = new AsyncAutoCommand<DatabaseCellViewModel>(EditParameter);
-
-            var comparer = Comparer<DatabaseEntitiesGroupViewModel>.Create((x, y) => x.GroupOrder.CompareTo(y.GroupOrder));
-            AutoDispose(rows.Connect()
-                .GroupOn(t => t.Key)
-                .Transform(GroupCreate)
-                .DisposeMany()
-                .Sort(comparer)
-                .Bind(out ReadOnlyObservableCollection<DatabaseEntitiesGroupViewModel> groupedRows)
-                .Subscribe(a =>
-                {
-                    
-                }, b => throw b));
-            Rows = groupedRows;
-
             RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
             RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.TableField.IsModified);
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
+            DuplicateCommand = new DelegateCommand<DatabaseCellViewModel?>(Duplicate, vm => vm != null);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
-            
-            foreach (var entity in solutionItem.Entries)
-                keys.Add(entity.Key);
             
             ScheduleLoading();
         }
@@ -115,6 +100,15 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 view.ParameterValue.SetNull();
         }
 
+        private void Duplicate(DatabaseCellViewModel? view)
+        {
+            if (view != null)
+            {
+                var duplicate = view.Parent.Entity.Clone();
+                ForceInsertEntity(duplicate, 0);
+            }
+        }
+        
         private async Task Revert(DatabaseCellViewModel? view)
         {
             if (view == null || view.IsReadOnly)
@@ -129,11 +123,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return;
 
             RemoveEntity(view.ParentEntity);
-        }
-
-        private DatabaseEntitiesGroupViewModel GroupCreate(IGroup<DatabaseEntityViewModel, uint> @group)
-        {
-            return new (group);
         }
         
         private async Task EditParameter(DatabaseCellViewModel cell)
@@ -156,11 +145,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         protected override async Task InternalLoadData(DatabaseTableData data)
         {
-            rows.Clear();
+            Rows.Clear();
             columns = tableDefinition.Groups.SelectMany(g => g.Fields).ToList();
             Columns.Clear();
             Columns.AddRange(columns.Select(c => new DatabaseColumnHeaderViewModel(c)));
                 
+            foreach (var entity in solutionItem.Entries)
+                EnsureKey(entity.Key);
+
             await AsyncAddEntities(data.Entities);
             History.AddHandler(AutoDispose(new MultiRowTableEditorHistoryHandler(this)));
         }
@@ -233,7 +225,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return false;
             
             Entities.RemoveAt(indexOfEntity);
-            rows.RemoveAt(indexOfEntity);
+            byEntryGroups[entity.Key].Remove(entity);
 
             return true;
         }
@@ -275,9 +267,19 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
 
             Entities.Insert(index, entity);
-            keys.Add(entity.Key);
-            rows.Insert(index, row);
+            EnsureKey(entity.Key);
+            
+            byEntryGroups[entity.Key].Add(row);
             return true;
+        }
+
+        private void EnsureKey(uint entity)
+        {
+            if (keys.Add(entity))
+            {
+                byEntryGroups[entity] = new DatabaseEntitiesGroupViewModel(entity, GenerateName(entity));
+                Rows.Add(byEntryGroups[entity]);
+            }
         }
 
         private async Task AsyncAddEntities(IList<DatabaseEntity> tableDataEntities)

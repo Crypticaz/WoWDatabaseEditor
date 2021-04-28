@@ -14,6 +14,7 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         private static MenuItem revertMenuItem;
         private static MenuItem setNullMenuItem;
         private static MenuItem deleteMenuItem;
+        private static MenuItem duplicateMenuItem;
         
         protected object cellValue = "(null)";
         public static readonly DirectProperty<FastCellViewBase, object> ValueProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, object>("Value", o => o.Value, (o, v) => o.Value = v, defaultBindingMode: BindingMode.TwoWay);
@@ -33,7 +34,14 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
         public static readonly DirectProperty<FastCellViewBase, ICommand?> SetNullCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(SetNullCommand), o => o.SetNullCommand, (o, v) => o.SetNullCommand = v);
         private ICommand? removeTemplateCommand;
         public static readonly DirectProperty<FastCellViewBase, ICommand?> RemoveTemplateCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(RemoveTemplateCommand), o => o.RemoveTemplateCommand, (o, v) => o.RemoveTemplateCommand = v);
-
+        private ICommand? duplicateCommand;
+        public static readonly DirectProperty<FastCellViewBase, ICommand?> DuplicateCommandProperty = AvaloniaProperty.RegisterDirect<FastCellViewBase, ICommand?>(nameof(DuplicateCommand), o => o.DuplicateCommand, (o, v) => o.DuplicateCommand = v);
+        
+        public ICommand? DuplicateCommand
+        {
+            get => duplicateCommand;
+            set => SetAndRaise(DuplicateCommandProperty, ref duplicateCommand, value);
+        }
         public ICommand? RemoveTemplateCommand
         {
             get => removeTemplateCommand;
@@ -113,12 +121,14 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             contextMenu = new ContextMenu();
             revertMenuItem = new MenuItem() {Header = "Revert value"};
             setNullMenuItem = new MenuItem() {Header = "Set to null"};
-            deleteMenuItem = new MenuItem() {Header = "Delete item from the editor"};
+            deleteMenuItem = new MenuItem() {Header = "Delete entity from the editor"};
+            duplicateMenuItem = new MenuItem() {Header = "Duplicate row"};
             contextMenu.Items = new Control[]
             {
                 revertMenuItem,
                 setNullMenuItem,
                 new Separator(),
+                duplicateMenuItem,
                 deleteMenuItem
             };
             contextMenu.MenuClosed += (sender, args) =>
@@ -126,9 +136,11 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
                 revertMenuItem.CommandParameter = null!;
                 setNullMenuItem.CommandParameter = null!;
                 deleteMenuItem.CommandParameter = null!;
+                duplicateMenuItem.CommandParameter = null!;
                 revertMenuItem.Command = null;
                 setNullMenuItem.Command = null;
                 deleteMenuItem.Command = null;
+                duplicateMenuItem.Command = null;
             };
         }
 
@@ -148,12 +160,16 @@ namespace WDE.DatabaseEditors.Avalonia.Controls
             {
                 revertMenuItem.IsEnabled = revertCommand?.CanExecute(DataContext!) ?? false;
                 setNullMenuItem.IsEnabled = setNullCommand?.CanExecute(DataContext!) ?? false;
+                duplicateMenuItem.IsVisible = duplicateCommand != null;
+                duplicateMenuItem.IsEnabled = duplicateCommand?.CanExecute(DataContext!) ?? false;
                 revertMenuItem.CommandParameter = DataContext!;
                 setNullMenuItem.CommandParameter = DataContext!;
                 deleteMenuItem.CommandParameter = DataContext!;
+                duplicateMenuItem.CommandParameter = DataContext!;
                 revertMenuItem.Command = revertCommand;
                 setNullMenuItem.Command = setNullCommand;
                 deleteMenuItem.Command = removeTemplateCommand;
+                duplicateMenuItem.Command = duplicateCommand;
                 contextMenu.Open(this);
                 e.Handled = true;
             }

@@ -88,6 +88,13 @@ namespace WDE.DatabaseEditors.Models
             throw new Exception("Unexpected value of type " + typeof(T));
         }
 
+        public IDatabaseField Clone()
+        {
+            var copy = new DatabaseField<T>(columnName, Current.Clone());
+            copy.Original.Value = Original.Value;
+            return copy;
+        }
+
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         public override string? ToString()

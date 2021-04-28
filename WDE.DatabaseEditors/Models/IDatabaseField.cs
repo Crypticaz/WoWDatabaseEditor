@@ -12,5 +12,6 @@ namespace WDE.DatabaseEditors.Models
         object? OriginalValue { get; set; }
         event Action<IHistoryAction> OnChanged;
         string ToQueryString();
+        IDatabaseField Clone();
     }
 }

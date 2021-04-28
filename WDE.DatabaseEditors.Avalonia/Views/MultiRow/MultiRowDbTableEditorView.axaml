@@ -84,6 +84,7 @@
                         ChooseParameterCommand="{Binding ElementName=rootWindow, Path=DataContext.OpenParameterWindow, Mode=OneTime}"
                         SetNullCommand="{Binding ElementName=rootWindow, Path=DataContext.SetNullCommand, Mode=OneTime}"
                         RevertCommand="{Binding ElementName=rootWindow, Path=DataContext.RevertCommand, Mode=OneTime}"
+                        DuplicateCommand="{Binding ElementName=rootWindow, Path=DataContext.DuplicateCommand, Mode=OneTime}"
                         RemoveTemplateCommand="{Binding ElementName=rootWindow, Path=DataContext.RemoveTemplateCommand, Mode=OneTime}"
                         CanBeNull="{Binding CanBeSetToNull, Mode=OneTime}"
                         StringValue="{Binding ParameterValue.String}">
@@ -92,16 +93,19 @@
             </helpers:FieldValueTemplateSelector.GenericTemplate>
         </helpers:FieldValueTemplateSelector>
     </UserControl.DataTemplates>
-    <ScrollViewer Grid.IsSharedSizeScope="True">
-        <StackPanel>
-            <Border Classes="header">
-                <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{Binding Columns, Mode=OneTime}" />
-            </Border>
+    
+        <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
+            <ScrollViewer DockPanel.Dock="Top" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Offset="{Binding Offset, ElementName=other, Mode=TwoWay}">
+                <Border Classes="header">
+                    <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{Binding Columns, Mode=OneTime}" />
+                </Border>
+            </ScrollViewer>
+            <ScrollViewer  HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Name="other" >
             <ItemsPresenter Items="{Binding Rows, Mode=OneTime}">
                 <ItemsPresenter.ItemTemplate>
                     <DataTemplate>
                         <StackPanel>
-                            <controls1:GroupingHeader GroupName="{Binding GroupName, Mode=OneTime}" />
+                            <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}" />
                             <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}">
                                 <controls:AlternatingItemsControl.ItemTemplate>
                                     <DataTemplate>
@@ -128,6 +132,6 @@
                     </DataTemplate>
                 </ItemsPresenter.ItemTemplate>
             </ItemsPresenter>
-        </StackPanel>
-    </ScrollViewer>
+            </ScrollViewer>
+        </DockPanel>
 </UserControl>

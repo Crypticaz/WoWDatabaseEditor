@@ -50,6 +50,7 @@ namespace WDE.DatabaseEditors.WPF.Controls
         private static MenuItem revertMenuItem;
         private static MenuItem setNullMenuItem;
         private static MenuItem deleteMenuItem;
+        private static MenuItem duplicateMenuItem;
 
         public static readonly DependencyProperty ValueProperty = DependencyProperty.Register("Value", typeof(object), typeof(FastCellViewBase));
         public static readonly DependencyProperty StringValueProperty = DependencyProperty.Register("StringValue", typeof(string), typeof(FastCellViewBase));
@@ -60,7 +61,13 @@ namespace WDE.DatabaseEditors.WPF.Controls
         public static readonly DependencyProperty RevertCommandProperty = DependencyProperty.Register(nameof(RevertCommand), typeof(ICommand), typeof(FastCellViewBase));
         public static readonly DependencyProperty SetNullCommandProperty = DependencyProperty.Register(nameof(SetNullCommand), typeof(ICommand), typeof(FastCellViewBase));
         public static readonly DependencyProperty RemoveTemplateCommandProperty = DependencyProperty.Register(nameof(RemoveTemplateCommand), typeof(ICommand), typeof(FastCellViewBase));
+        public static readonly DependencyProperty DuplicateCommandProperty = DependencyProperty.Register(nameof(DuplicateCommand), typeof(ICommand), typeof(FastCellViewBase));
 
+        public ICommand? DuplicateCommand
+        {
+            get => (ICommand?)GetValue(DuplicateCommandProperty);
+            set => SetValue(DuplicateCommandProperty, value);
+        }
         public ICommand? RemoveTemplateCommand
         {
             get => (ICommand?)GetValue(RemoveTemplateCommandProperty);
@@ -149,19 +156,23 @@ namespace WDE.DatabaseEditors.WPF.Controls
             contextMenu = new ContextMenu();
             revertMenuItem = new MenuItem() { Header = "Revert value" };
             setNullMenuItem = new MenuItem() { Header = "Set to null" };
-            deleteMenuItem = new MenuItem() { Header = "Delete item from the editor" };
+            duplicateMenuItem = new MenuItem() { Header = "Duplicate entity" };
+            deleteMenuItem = new MenuItem() { Header = "Delete entity from the editor" };
             contextMenu.Items.Add(revertMenuItem);
             contextMenu.Items.Add(setNullMenuItem);
             contextMenu.Items.Add(new Separator());
+            contextMenu.Items.Add(duplicateMenuItem);
             contextMenu.Items.Add(deleteMenuItem);
             contextMenu.Closed += (sender, args) =>
             {
                 revertMenuItem.CommandParameter = null!;
                 setNullMenuItem.CommandParameter = null!;
                 deleteMenuItem.CommandParameter = null!;
+                duplicateMenuItem.CommandParameter = null!;
                 revertMenuItem.Command = null;
                 setNullMenuItem.Command = null;
                 deleteMenuItem.Command = null;
+                duplicateMenuItem.Command = null;
             };
         }
 
@@ -170,12 +181,16 @@ namespace WDE.DatabaseEditors.WPF.Controls
             base.OnMouseRightButtonDown(e);
             revertMenuItem.IsEnabled = RevertCommand?.CanExecute(DataContext!) ?? false;
             setNullMenuItem.IsEnabled = SetNullCommand?.CanExecute(DataContext!) ?? false;
+            duplicateMenuItem.IsEnabled = DuplicateCommand?.CanExecute(DataContext!) ?? false;
+            duplicateMenuItem.Visibility = DuplicateCommand == null ? Visibility.Collapsed : Visibility.Visible;
             revertMenuItem.CommandParameter = DataContext!;
             setNullMenuItem.CommandParameter = DataContext!;
             deleteMenuItem.CommandParameter = DataContext!;
+            duplicateMenuItem.CommandParameter = DataContext!;
             revertMenuItem.Command = RevertCommand;
             setNullMenuItem.Command = SetNullCommand;
             deleteMenuItem.Command = RemoveTemplateCommand;
+            duplicateMenuItem.Command = DuplicateCommand;
             contextMenu.PlacementTarget = this;
             contextMenu.IsOpen = true;
             e.Handled = true;

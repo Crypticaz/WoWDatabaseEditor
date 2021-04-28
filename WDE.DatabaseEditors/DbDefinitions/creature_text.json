@@ -1,0 +1,90 @@
+{
+  "id": "creature_text",
+  "compatibility": [
+    "TrinityWrath"
+  ],
+  "name": "Creature texts",
+  "description": "Creature texts that can be spoken via custom creature scripts",
+  "table_name": "creature_text",
+  "table_index_name": "CreatureID",
+  "single_solution_name": "{name}'s texts",
+  "multi_solution_name": "Texts for multiple npcs",
+  "reload_command": "reload creature_text",
+  "multi_record": true,
+  "picker": "CreatureParameter",
+  "groups": [
+    {
+      "group_name": "only",
+      "fields": [
+        {
+          "name": "Creature",
+          "db_column_name": "CreatureID",
+          "read_only": true,
+          "value_type": "CreatureParameter"
+        },
+        {
+          "name": "Group",
+          "db_column_name": "GroupID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Id",
+          "db_column_name": "ID",
+          "value_type": "uint"
+        },
+        {
+          "name": "Text",
+          "db_column_name": "Text",
+          "value_type": "uint"
+        },
+        {
+          "name": "Type",
+          "db_column_name": "Type",
+          "default": 12,
+          "value_type": "uint"
+        },
+        {
+          "name": "Language",
+          "db_column_name": "Language",
+          "value_type": "LanguageParameter"
+        },
+        {
+          "name": "Probability",
+          "db_column_name": "Probability",
+          "default": 100,
+          "value_type": "BoolParameter"
+        },
+        {
+          "name": "Emote",
+          "db_column_name": "Emote",
+          "value_type": "EmoteParameter"
+        },
+        {
+          "name": "Duration",
+          "db_column_name": "Duration",
+          "value_type": "uint"
+        },
+        {
+          "name": "Sound",
+          "db_column_name": "sound",
+          "value_type": "SoundParameter"
+        },
+        {
+          "name": "Broadcast text",
+          "db_column_name": "BroadcastTextId",
+          "value_type": "uint"
+        },
+        {
+          "name": "Text range",
+          "db_column_name": "TextRange",
+          "value_type": "uint"
+        },
+        {
+          "name": "Comment",
+          "db_column_name": "Comment",
+          "value_type": "string"
+        }
+      ]
+    }
+  ]
+}

@@ -9,14 +9,14 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
     public class DatabaseEntityViewModel : BindableBase
     {
         public string Name { get; }
-        public uint Key => entity.Key;
-        private readonly DatabaseEntity entity;
+        public uint Key => Entity.Key;
+        public DatabaseEntity Entity { get; }
         public ObservableCollection<DatabaseCellViewModel> Cells { get; } = new();
 
         public DatabaseEntityViewModel(DatabaseEntity entity, string name)
         {
             Name = name;
-            this.entity = entity;
+            Entity = entity;
         }
     }
 }

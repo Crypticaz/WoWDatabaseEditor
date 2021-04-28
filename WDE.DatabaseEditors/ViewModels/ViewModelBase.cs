@@ -11,6 +11,7 @@ using WDE.Common;
 using WDE.Common.Events;
 using WDE.Common.History;
 using WDE.Common.Managers;
+using WDE.Common.Parameters;
 using WDE.Common.Services;
 using WDE.Common.Services.MessageBox;
 using WDE.Common.Solution;
@@ -35,7 +36,8 @@ namespace WDE.DatabaseEditors.ViewModels
         private readonly IDatabaseTableDataProvider databaseTableDataProvider;
         private readonly IMessageBoxService messageBoxService;
         private readonly ITaskRunner taskRunner;
-        
+        private readonly IParameterFactory parameterFactory;
+
         protected ViewModelBase(IHistoryManager history,
             DatabaseTableSolutionItem solutionItem,
             ISolutionItemNameRegistry solutionItemName,
@@ -44,8 +46,9 @@ namespace WDE.DatabaseEditors.ViewModels
             IEventAggregator eventAggregator,
             IQueryGenerator queryGenerator,
             IDatabaseTableDataProvider databaseTableDataProvider,
-            IMessageBoxService messageBoxService, 
-            ITaskRunner taskRunner)
+            IMessageBoxService messageBoxService,
+            ITaskRunner taskRunner,
+            IParameterFactory parameterFactory)
         {
             this.solutionItemName = solutionItemName;
             this.solutionManager = solutionManager;
@@ -54,6 +57,7 @@ namespace WDE.DatabaseEditors.ViewModels
             this.databaseTableDataProvider = databaseTableDataProvider;
             this.messageBoxService = messageBoxService;
             this.taskRunner = taskRunner;
+            this.parameterFactory = parameterFactory;
             this.solutionItem = solutionItem;
             History = history;
             
@@ -61,6 +65,7 @@ namespace WDE.DatabaseEditors.ViewModels
             redoCommand = new DelegateCommand(History.Redo, CanRedo);
             Save = new DelegateCommand(SaveSolutionItem);
             title = solutionItemName.GetName(solutionItem);
+            nameGeneratorParameter = parameterFactory.Factory("Parameter");
             
             History.PropertyChanged += (_, _) =>
             {
@@ -124,8 +129,14 @@ namespace WDE.DatabaseEditors.ViewModels
             
             Entities.Clear();
             tableDefinition = data.TableDefinition;
+            nameGeneratorParameter = parameterFactory.Factory(tableDefinition.Picker);
             await InternalLoadData(data);
             IsLoading = false;
+        }
+
+        protected string GenerateName(uint entity)
+        {
+            return nameGeneratorParameter.ToString(entity);
         }
         
         protected DatabaseTableDefinitionJson tableDefinition = null!;
@@ -136,6 +147,8 @@ namespace WDE.DatabaseEditors.ViewModels
 
         private bool CanRedo() => History.CanRedo;
         private bool CanUndo() => History.CanUndo;
+
+        private IParameter<long> nameGeneratorParameter;
         
         private bool isLoading;
         public bool IsLoading
