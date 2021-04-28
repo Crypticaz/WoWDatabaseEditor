@@ -13,7 +13,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public IDatabaseField TableField { get; }
         public IParameterValue ParameterValue { get; }
         public bool IsVisible { get; private set; } = true;
-        public bool IsModified { get; private set; }
         public string? OriginalValueTooltip { get; private set; }
         public bool CanBeNull { get; }
         public bool IsReadOnly { get; }
@@ -25,7 +24,6 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public DatabaseCellViewModel(int columnIndex, DbEditorTableGroupFieldJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue)
         {
-            Link(tableField, tf => tf.IsModified, () => IsModified);
             ColumnIndex = columnIndex * 2;
             CanBeNull = columnDefinition.CanBeNull;
             IsReadOnly = columnDefinition.IsReadOnly;

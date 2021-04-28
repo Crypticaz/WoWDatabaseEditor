@@ -1,5 +1,6 @@
 ﻿using System;
 using WDE.Common.History;
+using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 using WDE.MVVM.Observable;
 
@@ -36,10 +37,17 @@ namespace WDE.DatabaseEditors.History
                     e.Item.OnAction -= PushAction;
                 }
             });
+            viewModel.OnDeleteQuery += ViewModelOnDeleteQuery;
+        }
+
+        private void ViewModelOnDeleteQuery(DatabaseEntity obj)
+        {
+            PushAction(new DatabaseLastRowRemovedHistoryAction(viewModel, obj));
         }
 
         private void UnbindTableData()
         {
+            viewModel.OnDeleteQuery -= ViewModelOnDeleteQuery;
             disposable?.Dispose();
             disposable = null;
         }

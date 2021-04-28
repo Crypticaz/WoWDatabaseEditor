@@ -48,6 +48,8 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public DelegateCommand<DatabaseCellViewModel?> SetNullCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
 
+        public event Action<DatabaseEntity>? OnDeleteQuery;
+
         public MultiRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
             IHistoryManager history, ITaskRunner taskRunner, IMessageBoxService messageBoxService,
@@ -82,9 +84,12 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             Rows = groupedRows;
 
             RemoveTemplateCommand = new DelegateCommand<DatabaseCellViewModel?>(RemoveTemplate, vm => vm != null);
-            RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.IsModified);
+            RevertCommand = new AsyncAutoCommand<DatabaseCellViewModel?>(Revert, cell => cell is DatabaseCellViewModel vm && vm.CanBeReverted && vm.TableField.IsModified);
             SetNullCommand = new DelegateCommand<DatabaseCellViewModel?>(SetToNull, vm => vm != null && vm.CanBeSetToNull);
             AddNewCommand = new AsyncAutoCommand(AddNewEntity);
+            
+            foreach (var entity in solutionItem.Entries)
+                keys.Add(entity.Key);
             
             ScheduleLoading();
         }
@@ -101,29 +106,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 return;
 
             foreach (var entity in data.Entities)
-            {
-                if (ContainsEntity(entity))
-                {
-                    await messageBoxService.ShowDialog(new MessageBoxFactory<bool>().SetTitle("Entity already added")
-                        .SetMainInstruction($"Entity {entity.Key} is already added to the editor")
-                        .WithOkButton(false)
-                        .SetIcon(MessageBoxIcon.Information)
-                        .Build());
-                    continue;
-                }
-                if (!entity.ExistInDatabase)
-                {
-                    if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
-                        .SetTitle("Entity doesn't exist in database")
-                        .SetMainInstruction($"Entity {entity.Key} doesn't exist in the database")
-                        .SetContent(
-                            "WoW Database Editor will be generating DELETE/INSERT query instead of UPDATE. Do you want to continue?")
-                        .WithYesButton(true)
-                        .WithNoButton(false).Build()))
-                        continue;
-                }
                 await AddEntity(entity);
-            }
         }
         
         private void SetToNull(DatabaseCellViewModel? view)
@@ -152,15 +135,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         {
             return new (group);
         }
-
-        private bool ContainsEntity(DatabaseEntity entity)
-        {
-            foreach (var e in Entities)
-                if (e.Key == entity.Key)
-                    return true;
-            return false;
-        }
-
+        
         private async Task EditParameter(DatabaseCellViewModel cell)
         {
             var valueHolder = cell.ParameterValue as ParameterValue<long>;
@@ -198,6 +173,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
+            bool invokedDelete = false;
             var itemsWithSameKey = Entities.Count(e => e.Key == entity.Key);
 
             if (itemsWithSameKey == 1)
@@ -206,7 +182,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                     .SetTitle("Removing entity")
                     .SetMainInstruction($"Do you want to delete the key {entity.Key} from solution?")
                     .SetContent(
-                        $"This entity is the last row with key {entity.Key}. You have to choose if you want to delete the key from solution as well.\n\nIf you delete it from the solution, DELETE FROM... will no longer be generated for this key.")
+                        $"This entity is the last row with key {entity.Key}. You have to choose if you want to delete the key from the solution as well.\n\nIf you delete it from the solution, DELETE FROM... will no longer be generated for this key.")
                     .WithYesButton(true)
                     .WithNoButton(false)
                     .SetIcon(MessageBoxIcon.Information)
@@ -223,7 +199,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                             .WithNoButton(false)
                             .Build()))
                         {
+                            invokedDelete = true;
                             await mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
+                            History.MarkNoSave();
                         }
                     }
 
@@ -231,9 +209,23 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                 }
             }
             
-            return ForceRemoveEntity(entity);
+            var removed =  ForceRemoveEntity(entity);
+            if (invokedDelete)
+                OnDeleteQuery?.Invoke(entity);
+            return removed;
+        }
+        
+        public void UndoDeleteQuery(DatabaseEntity entity)
+        {
         }
 
+        public void DoDeleteQuery(DatabaseEntity entity)
+        {
+            keys.Remove(entity.Key);
+            mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
+            History.MarkNoSave();
+        }
+        
         public override bool ForceRemoveEntity(DatabaseEntity entity)
         {
             var indexOfEntity = Entities.IndexOf(entity);

@@ -84,8 +84,17 @@ namespace WDE.DatabaseEditors.Solution
             if (key.HasValue)
             {
                 var data = await tableDataProvider.Load(definition.Id, (uint)key.Value);
-                if (data != null && data.Entities.Count > 0)
+                
+                if (data == null)
+                    return null;
+                
+                if (data.TableDefinition.IsMultiRecord)
+                    return new DatabaseTableSolutionItem((uint)key.Value, false, definition.Id);
+                else
                 {
+                    if (data.Entities.Count == 0)
+                        return null; 
+                    
                     if (!data.Entities[0].ExistInDatabase)
                     {
                         if (!await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()

@@ -128,10 +128,13 @@ namespace WDE.DatabaseEditors.Data
                     rows.Add(new DatabaseEntity(true, key.Value, columns));
             }
 
-            foreach (var key in keys)
+            if (!tableDefinition.IsMultiRecord)
             {
-                if (!providedKeys.Contains(key))
-                    rows.Add(BuildEmptyEntity(tableDefinition, key));
+                foreach (var key in keys)
+                {
+                    if (!providedKeys.Contains(key))
+                        rows.Add(BuildEmptyEntity(tableDefinition, key));
+                }   
             }
 
             try
