@@ -13,10 +13,10 @@ namespace WDE.DatabaseEditors.ViewModels.Template
         public bool IsReadOnly { get; }
         public bool CanBeNull { get; }
         public ObservableCollection<DatabaseCellViewModel> Cells { get; } = new();
-        public DbEditorTableGroupFieldJson ColumnData { get; }
+        public DatabaseColumnJson ColumnData { get; }
         public DatabaseColumnsGroupJson GroupData { get; }
 
-        public DatabaseRowViewModel(DbEditorTableGroupFieldJson columnData, DatabaseColumnsGroupJson group, int categoryIndex, int index)
+        public DatabaseRowViewModel(DatabaseColumnJson columnData, DatabaseColumnsGroupJson group, int categoryIndex, int index)
         {
             GroupData = group;
             ColumnData = columnData;

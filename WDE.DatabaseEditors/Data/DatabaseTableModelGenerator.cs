@@ -31,7 +31,7 @@ namespace WDE.DatabaseEditors.Data
             
             foreach (var column in definition.Groups.SelectMany(t => t.Fields)
                 .Distinct(
-                    EqualityComparerFactory.Create<DbEditorTableGroupFieldJson>(
+                    EqualityComparerFactory.Create<DatabaseColumnJson>(
                         f => f.DbColumnName.GetHashCode(),
                         (a, b) => a!.DbColumnName.Equals(b!.DbColumnName))))
             {

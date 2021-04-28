@@ -9,7 +9,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public string DatabaseName { get; }
         public float? PreferredWidth { get; }
         
-        public DatabaseColumnHeaderViewModel(DbEditorTableGroupFieldJson column)
+        public DatabaseColumnHeaderViewModel(DatabaseColumnJson column)
         {
             Name = column.Name;
             DatabaseName = column.DbColumnName;

@@ -6,7 +6,6 @@ using WDE.Common.Database;
 using WDE.Common.Services.MessageBox;
 using WDE.DatabaseEditors.Data.Interfaces;
 using WDE.DatabaseEditors.Data.Structs;
-using WDE.DatabaseEditors.Factories;
 using WDE.DatabaseEditors.Models;
 using WDE.Module.Attributes;
 

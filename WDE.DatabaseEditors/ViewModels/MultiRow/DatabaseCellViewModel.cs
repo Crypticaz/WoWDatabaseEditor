@@ -22,7 +22,7 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         
         public string ColumnName { get; }
 
-        public DatabaseCellViewModel(int columnIndex, DbEditorTableGroupFieldJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue)
+        public DatabaseCellViewModel(int columnIndex, DatabaseColumnJson columnDefinition, DatabaseEntityViewModel parent, DatabaseEntity parentEntity, IDatabaseField tableField, IParameterValue parameterValue)
         {
             ColumnIndex = columnIndex * 2;
             CanBeNull = columnDefinition.CanBeNull;

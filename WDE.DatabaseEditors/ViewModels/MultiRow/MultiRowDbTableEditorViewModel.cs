@@ -39,9 +39,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         private Dictionary<uint, DatabaseEntitiesGroupViewModel> byEntryGroups = new();
         public ObservableCollection<DatabaseEntitiesGroupViewModel> Rows { get; } = new();
 
-        private IList<DbEditorTableGroupFieldJson> columns = new List<DbEditorTableGroupFieldJson>();
+        private IList<DatabaseColumnJson> columns = new List<DatabaseColumnJson>();
         public ObservableCollection<DatabaseColumnHeaderViewModel> Columns { get; } = new();
-        private DbEditorTableGroupFieldJson? autoIncrementColumn;
+        private DatabaseColumnJson? autoIncrementColumn;
 
         private HashSet<uint> keys = new();
 

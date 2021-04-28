@@ -21,7 +21,7 @@ namespace WDE.DatabaseEditors.Data
                 var definition =
                     serializationProvider.DeserializeTableDefinition<DatabaseTableDefinitionJson>(source);
 
-                definition.TableColumns = new Dictionary<string, DbEditorTableGroupFieldJson>();
+                definition.TableColumns = new Dictionary<string, DatabaseColumnJson>();
                 foreach (var group in definition.Groups)
                 {
                     foreach (var column in group.Fields)

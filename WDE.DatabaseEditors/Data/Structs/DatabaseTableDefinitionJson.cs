@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using Newtonsoft.Json;
 
 namespace WDE.DatabaseEditors.Data.Structs
@@ -54,73 +53,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         public IList<DatabaseColumnsGroupJson> Groups { get; set; } = new List<DatabaseColumnsGroupJson>();
 
         [JsonIgnore] 
-        public IDictionary<string, DbEditorTableGroupFieldJson> TableColumns { get; set; } = null!;
+        public IDictionary<string, DatabaseColumnJson> TableColumns { get; set; } = null!;
         
         [JsonIgnore] 
         public IDictionary<string, DatabaseForeignTableJson> ForeignTableByName { get; set; } = null!;
-    }
-
-    public struct DatabaseForeignTableJson
-    {
-        [JsonProperty(PropertyName = "table_name")]
-        public string TableName { get; set; }
-        
-        [JsonProperty(PropertyName = "foreign_key")]
-        public string ForeignKey { get; set; }
-    }
-
-    [ExcludeFromCodeCoverage]
-    public struct DatabaseColumnsGroupJson
-    {
-        [JsonProperty(PropertyName = "group_name")]
-        public string Name { get; set; }
-        
-        [JsonProperty(PropertyName = "show_if")]
-        public ShowIfCondition? ShowIf { get; set; }
-        
-        [JsonProperty(PropertyName = "group_sort_field")]
-        public string? GroupSortField { get; set; }
-
-        [JsonProperty(PropertyName = "fields")]
-        public IList<DbEditorTableGroupFieldJson> Fields { get; set; }
-
-        public struct ShowIfCondition
-        {
-            [JsonProperty(PropertyName = "db_column_name")]
-            public string ColumnName { get; set; }
-            
-            [JsonProperty(PropertyName = "value")]
-            public int Value { get; set; }
-        }
-    }
-
-    public class DbEditorTableGroupFieldJson
-    {
-        [JsonProperty(PropertyName = "name")] 
-        public string Name { get; set; } = "";
-        
-        [JsonProperty(PropertyName = "db_column_name")]
-        public string DbColumnName { get; set; } = "";
-        
-        [JsonProperty(PropertyName = "foreign_table")]
-        public string? ForeignTable { get; set; }
-        
-        [JsonProperty(PropertyName = "value_type")]
-        public string ValueType { get; set; } = "";
-
-        [JsonProperty(PropertyName = "default")]
-        public object? Default { get; set; }
-        
-        [JsonProperty(PropertyName = "autoincrement")]
-        public bool AutoIncrement { get; set; }
-        
-        [JsonProperty(PropertyName = "read_only")]
-        public bool IsReadOnly { get; set; }
-        
-        [JsonProperty(PropertyName = "can_be_null")]
-        public bool CanBeNull { get; set; }
-        
-        [JsonProperty(PropertyName = "preferred_width")]
-        public float? PreferredWidth { get; set; }
     }
 }
