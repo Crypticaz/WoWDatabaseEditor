@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using WDE.DatabaseEditors.Data.Interfaces;
@@ -51,17 +52,30 @@ namespace WDE.DatabaseEditors.QueryGenerators
 
             query.AppendLine($"INSERT INTO {tableData.TableDefinition.TableName} ({columnsString}) VALUES");
 
+            HashSet<EntityKey> entityKeys = new();
             List<string> inserts = new List<string>(tableData.Entities.Count);
+            List<string> duplicates = new List<string>();
             foreach (var entity in tableData.Entities)
             {
+                bool duplicate = tableData.TableDefinition.PrimaryKey != null && !entityKeys.Add(new EntityKey(entity, tableData.TableDefinition));
                 var cells = entity.Fields.Select(f => f.ToQueryString());
                 var cellStrings = string.Join(", ", cells);
-                inserts.Add($"({cellStrings})");
+                
+                if (duplicate)
+                    duplicates.Add($"({cellStrings})");
+                else
+                    inserts.Add($"({cellStrings})");
             }
 
             query.Append(string.Join(",\n", inserts));
-            
             query.AppendLine(";");
+
+            if (duplicates.Count > 0)
+            {
+                query.AppendLine(" -- duplicates, cannot insert:");
+                foreach (var line in duplicates)
+                    query.AppendLine(" -- " + line);
+            }
             
             return query.ToString();
         }
@@ -143,6 +157,40 @@ namespace WDE.DatabaseEditors.QueryGenerators
             }
 
             return query.ToString();
+        }
+
+        private class EntityKey
+        {
+            private IList<IDatabaseField> fields;
+            private int hash;
+            
+            public EntityKey(DatabaseEntity entity, DatabaseTableDefinitionJson table)
+            {
+                fields = table.PrimaryKey!.Select(key => entity.GetCell(key)!).ToList();
+                hash = 0;
+                foreach (var field in fields)
+                    hash = HashCode.Combine(hash, field.GetHashCode());
+            }
+
+            protected bool Equals(EntityKey other)
+            {
+                if (other.fields.Count != fields.Count)
+                    return false;
+                for (int i = 0; i < fields.Count; ++i)
+                    if (!fields[i].Equals(other.fields[i]))
+                        return false;
+                return true;
+            }
+
+            public override bool Equals(object? obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                if (obj.GetType() != this.GetType()) return false;
+                return Equals((EntityKey) obj);
+            }
+
+            public override int GetHashCode() => hash;
         }
     }
 }

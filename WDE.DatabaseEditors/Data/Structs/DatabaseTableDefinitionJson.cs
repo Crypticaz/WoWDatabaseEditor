@@ -44,6 +44,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "table_name_source_field")]
         public string? TableNameSource { get; set; }
         
+        [JsonProperty(PropertyName = "primary_key")]
+        public IList<string>? PrimaryKey { get; set; }
+        
         [JsonProperty(PropertyName = "foreign_tables")]
         public IList<DatabaseForeignTableJson>? ForeignTable { get; set; }
         
@@ -116,5 +119,8 @@ namespace WDE.DatabaseEditors.Data.Structs
         
         [JsonProperty(PropertyName = "can_be_null")]
         public bool CanBeNull { get; set; }
+        
+        [JsonProperty(PropertyName = "preferred_width")]
+        public float? PreferredWidth { get; set; }
     }
 }

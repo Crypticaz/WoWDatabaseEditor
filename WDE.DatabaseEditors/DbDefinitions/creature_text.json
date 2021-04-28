@@ -12,6 +12,7 @@
   "reload_command": "reload creature_text",
   "multi_record": true,
   "picker": "CreatureParameter",
+  "primary_key": ["CreatureID", "GroupID", "ID"],
   "groups": [
     {
       "group_name": "only",
@@ -26,23 +27,27 @@
           "name": "Group",
           "db_column_name": "GroupID",
           "value_type": "uint",
-          "autoincrement": true
+          "autoincrement": true,
+          "preferred_width": 50
         },
         {
           "name": "Id",
           "db_column_name": "ID",
-          "value_type": "uint"
+          "value_type": "uint",
+          "preferred_width": 50
         },
         {
           "name": "Text",
           "db_column_name": "Text",
-          "value_type": "string"
+          "value_type": "string",
+          "preferred_width": 180
         },
         {
           "name": "Type",
           "db_column_name": "Type",
           "default": 12,
-          "value_type": "CreatureTextTypeParameter"
+          "value_type": "CreatureTextTypeParameter",
+          "preferred_width": 120
         },
         {
           "name": "Language",

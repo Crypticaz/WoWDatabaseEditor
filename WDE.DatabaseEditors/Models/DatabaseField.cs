@@ -101,7 +101,25 @@ namespace WDE.DatabaseEditors.Models
         {
             return Current.ToString();
         }
-        
+
+        protected bool Equals(DatabaseField<T> other)
+        {
+            return columnName == other.columnName && (Current.Value == null && other.Current.Value == null || Current.Value!.Equals(other.Current.Value));
+        }
+
+        public override bool Equals(object? obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != this.GetType()) return false;
+            return Equals((DatabaseField<T>) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(columnName, Current.Value);
+        }
+
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName]
             string? propertyName = null)

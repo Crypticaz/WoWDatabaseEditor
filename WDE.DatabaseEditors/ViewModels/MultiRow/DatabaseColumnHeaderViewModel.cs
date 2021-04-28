@@ -7,11 +7,13 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
     {
         public string Name { get; }
         public string DatabaseName { get; }
+        public float? PreferredWidth { get; }
         
         public DatabaseColumnHeaderViewModel(DbEditorTableGroupFieldJson column)
         {
             Name = column.Name;
             DatabaseName = column.DbColumnName;
+            PreferredWidth = column.PreferredWidth;
         }
     }
 }
