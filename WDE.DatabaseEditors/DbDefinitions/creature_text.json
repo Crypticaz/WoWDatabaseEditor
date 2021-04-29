@@ -28,26 +28,26 @@
           "db_column_name": "GroupID",
           "value_type": "uint",
           "autoincrement": true,
-          "preferred_width": 50
+          "preferred_width": 40
         },
         {
           "name": "Id",
           "db_column_name": "ID",
           "value_type": "uint",
-          "preferred_width": 50
+          "preferred_width": 40
         },
         {
           "name": "Text",
           "db_column_name": "Text",
           "value_type": "string",
-          "preferred_width": 180
+          "preferred_width": 190
         },
         {
           "name": "Type",
           "db_column_name": "Type",
           "default": 12,
           "value_type": "CreatureTextTypeParameter",
-          "preferred_width": 120
+          "preferred_width": 150
         },
         {
           "name": "Language",
