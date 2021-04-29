@@ -37,17 +37,31 @@ namespace WDE.DatabaseEditors.History
                     e.Item.OnAction -= PushAction;
                 }
             });
-            viewModel.OnDeleteQuery += ViewModelOnDeleteQuery;
+            viewModel.OnKeyDeleted += ViewModelOnDeleteQuery;
+            viewModel.OnKeyAdded += ViewModelOnKeyAdded;
+            viewModel.OnDeletedQuery += ViewModelOnDeletedQuery;
+        }
+
+        private void ViewModelOnDeletedQuery(DatabaseEntity obj)
+        {
+            PushAction(new DatabaseExecuteDeleteHistoryAction(viewModel, obj));
+        }
+
+        private void ViewModelOnKeyAdded(uint key)
+        {
+            PushAction(new DatabaseKeyAddedHistoryAction(viewModel, key));
         }
 
         private void ViewModelOnDeleteQuery(DatabaseEntity obj)
         {
-            PushAction(new DatabaseLastRowRemovedHistoryAction(viewModel, obj));
+            PushAction(new DatabaseKeyRemovedHistoryAction(viewModel, obj.Key));
         }
 
         private void UnbindTableData()
         {
-            viewModel.OnDeleteQuery -= ViewModelOnDeleteQuery;
+            viewModel.OnDeletedQuery -= ViewModelOnDeletedQuery;
+            viewModel.OnKeyAdded -= ViewModelOnKeyAdded;
+            viewModel.OnKeyDeleted -= ViewModelOnDeleteQuery;
             disposable?.Dispose();
             disposable = null;
         }

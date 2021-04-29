@@ -53,7 +53,9 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
         public DelegateCommand<DatabaseEntitiesGroupViewModel> AddRowCommand { get; }
         public AsyncAutoCommand<DatabaseCellViewModel> OpenParameterWindow { get; }
 
-        public event Action<DatabaseEntity>? OnDeleteQuery;
+        public event Action<DatabaseEntity>? OnDeletedQuery;
+        public event Action<DatabaseEntity>? OnKeyDeleted;
+        public event Action<uint>? OnKeyAdded;
 
         public MultiRowDbTableEditorViewModel(DatabaseTableSolutionItem solutionItem,
             IDatabaseTableDataProvider tableDataProvider, IItemFromListProvider itemFromListProvider,
@@ -116,6 +118,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             var data = await tableDataProvider.Load(tableDefinition.Id, (uint) selected);
             if (data == null) 
                 return;
+
+            OnKeyAdded?.Invoke((uint)selected);
+            
+            EnsureKey((uint)selected);
 
             foreach (var entity in data.Entities)
                 await AddEntity(entity);
@@ -193,9 +199,10 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
 
         public async Task<bool> RemoveEntity(DatabaseEntity entity)
         {
-            bool invokedDelete = false;
             var itemsWithSameKey = Entities.Count(e => e.Key == entity.Key);
 
+            var removed = ForceRemoveEntity(entity);
+            
             if (itemsWithSameKey == 1)
             {
                 if (await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
@@ -219,31 +226,36 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
                             .WithNoButton(false)
                             .Build()))
                         {
-                            invokedDelete = true;
+                            OnDeletedQuery?.Invoke(entity);
                             await mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
                             History.MarkNoSave();
                         }
                     }
-
-                    keys.Remove(entity.Key);
+                    RemoveKey(entity.Key);
+                    OnKeyDeleted?.Invoke(entity);
                 }
             }
             
-            var removed =  ForceRemoveEntity(entity);
-            if (invokedDelete)
-                OnDeleteQuery?.Invoke(entity);
             return removed;
         }
         
-        public void UndoDeleteQuery(DatabaseEntity entity)
+        public void RedoExecuteDelete(DatabaseEntity entity)
         {
+            if (mySqlExecutor.IsConnected)
+            {
+                mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
+                History.MarkNoSave();
+            }
+        }
+        
+        public void DoAddKey(uint entity)
+        {
+            EnsureKey(entity);
         }
 
-        public void DoDeleteQuery(DatabaseEntity entity)
+        public void UndoAddKey(uint entity)
         {
-            keys.Remove(entity.Key);
-            mySqlExecutor.ExecuteSql(queryGenerator.GenerateDeleteQuery(tableDefinition, entity));
-            History.MarkNoSave();
+            RemoveKey(entity);
         }
         
         public override bool ForceRemoveEntity(DatabaseEntity entity)
@@ -299,6 +311,15 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             
             byEntryGroups[entity.Key].Add(row);
             return true;
+        }
+
+        private void RemoveKey(uint entity)
+        {
+            if (keys.Remove(entity))
+            {
+                Rows.Remove(byEntryGroups[entity]);
+                byEntryGroups.Remove(entity);
+            }
         }
 
         private void EnsureKey(uint entity)

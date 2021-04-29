@@ -11,6 +11,22 @@
              Name="rootWindow"
              x:Class="WDE.DatabaseEditors.Avalonia.Views.MultiRow.MultiRowDbTableEditorView">
     <UserControl.Resources>
+        <ItemsPanelTemplate x:Key="HorizontalRowPanel">
+            <Grid helpers:GridColumnsBinder.Columns="{Binding DataContext.Columns, ElementName=rootWindow}">
+                                                            
+            </Grid>
+        </ItemsPanelTemplate>
+        <DataTemplate x:Key="RowTemplate">
+            <Panel Classes="alternating">
+                <ItemsPresenter Items="{Binding Cells, Mode=OneTime}" ItemsPanel="{StaticResource HorizontalRowPanel}">
+                    <ItemsPresenter.Styles>
+                        <Style Selector="Grid > ContentPresenter">
+                            <Setter Property="(Grid.Column)" Value="{Binding ColumnIndex}" />
+                        </Style>
+                    </ItemsPresenter.Styles>
+                </ItemsPresenter>
+            </Panel>
+        </DataTemplate>
     </UserControl.Resources>
     <UserControl.Styles>
         <styles:StyleIncludeColorAware DarkSource="avares://WDE.DatabaseEditors.Avalonia/Views/ColorsDark.axaml"
@@ -94,48 +110,32 @@
         </helpers:FieldValueTemplateSelector>
     </UserControl.DataTemplates>
     
-        <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
-            <ScrollViewer DockPanel.Dock="Top" HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Offset="{Binding Offset, ElementName=other, Mode=TwoWay}">
-                <Border Classes="header">
+    <DockPanel LastChildFill="True">
+        <StackPanel Margin="10" VerticalAlignment="Center" DockPanel.Dock="Top">
+            <Button Command="{Binding AddNewCommand, Mode=OneTime}">
+                Add new key
+            </Button>
+        </StackPanel>
+        <ScrollViewer>
+            <DockPanel Grid.IsSharedSizeScope="True" LastChildFill="True">
+                <Border Classes="header" DockPanel.Dock="Top">
                     <Grid helpers:GridColumnsBinder.ColumnsWithHeader="{Binding Columns, Mode=OneTime}" />
                 </Border>
-            </ScrollViewer>
-            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Hidden" Name="other" >
-            <ItemsPresenter Items="{Binding Rows, Mode=OneTime}">
-                <ItemsPresenter.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel>
-                            <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}">
-                                <controls1:GroupingHeader.CustomContent>
-                                    <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRow, Mode=OneTime}" CommandParameter="{Binding ., Mode=OneTime}">+</Button>
-                                </controls1:GroupingHeader.CustomContent>
-                            </controls1:GroupingHeader>
-                            <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}" MinHeight="20">
-                                <controls:AlternatingItemsControl.ItemTemplate>
-                                    <DataTemplate>
-                                        <Panel Classes="alternating">
-                                            <ItemsPresenter Items="{Binding Cells, Mode=OneTime}">
-                                                <ItemsPresenter.ItemsPanel>
-                                                    <ItemsPanelTemplate>
-                                                        <Grid helpers:GridColumnsBinder.Columns="{Binding DataContext.Columns, ElementName=rootWindow}">
-                                                            
-                                                        </Grid>
-                                                    </ItemsPanelTemplate>
-                                                </ItemsPresenter.ItemsPanel>
-                                                <ItemsPresenter.Styles>
-                                                    <Style Selector="Grid > ContentPresenter">
-                                                        <Setter Property="(Grid.Column)" Value="{Binding ColumnIndex}" />
-                                                    </Style>
-                                                </ItemsPresenter.Styles>
-                                            </ItemsPresenter>
-                                        </Panel>
-                                    </DataTemplate>
-                                </controls:AlternatingItemsControl.ItemTemplate>
-                            </controls:AlternatingItemsControl>
-                        </StackPanel>
-                    </DataTemplate>
-                </ItemsPresenter.ItemTemplate>
-            </ItemsPresenter>
-            </ScrollViewer>
-        </DockPanel>
+                <ItemsPresenter Items="{Binding Rows, Mode=OneTime}">
+                    <ItemsPresenter.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel>
+                                <controls1:GroupingHeader GroupName="{Binding Name, Mode=OneTime}">
+                                    <controls1:GroupingHeader.CustomContent>
+                                        <Button Command="{Binding ElementName=rootWindow, Path=DataContext.AddRow, Mode=OneTime}" CommandParameter="{Binding ., Mode=OneTime}">+</Button>
+                                    </controls1:GroupingHeader.CustomContent>
+                                </controls1:GroupingHeader>
+                                <controls:AlternatingItemsControl Items="{Binding ., Mode=OneTime}" MinHeight="20" ItemTemplate="{StaticResource RowTemplate}" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ItemsPresenter.ItemTemplate>
+                </ItemsPresenter>
+            </DockPanel>
+        </ScrollViewer>
+    </DockPanel>
 </UserControl>

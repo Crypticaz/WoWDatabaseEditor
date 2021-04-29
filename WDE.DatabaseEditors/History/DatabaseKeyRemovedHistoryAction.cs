@@ -1,16 +1,15 @@
 using WDE.Common.History;
-using WDE.DatabaseEditors.Models;
 using WDE.DatabaseEditors.ViewModels.MultiRow;
 
 namespace WDE.DatabaseEditors.History
 {
-    public class DatabaseLastRowRemovedHistoryAction : IHistoryAction
+    public class DatabaseKeyRemovedHistoryAction : IHistoryAction
     {
         private readonly MultiRowDbTableEditorViewModel viewModel;
-        private readonly DatabaseEntity entity;
+        private readonly uint entity;
 
-        public DatabaseLastRowRemovedHistoryAction(MultiRowDbTableEditorViewModel viewModel,
-            DatabaseEntity entity)
+        public DatabaseKeyRemovedHistoryAction(MultiRowDbTableEditorViewModel viewModel,
+            uint entity)
         {
             this.viewModel = viewModel;
             this.entity = entity;
@@ -18,17 +17,17 @@ namespace WDE.DatabaseEditors.History
         
         public void Undo()
         {
-            viewModel.UndoDeleteQuery(entity);
+            viewModel.DoAddKey(entity);
         }
 
         public void Redo()
         {
-            viewModel.DoDeleteQuery(entity);
+            viewModel.UndoAddKey(entity);
         }
 
         public string GetDescription()
         {
-            return $"Delete query invoked for key {entity.Key}";
+            return $"Removed key {entity}";
         }
     }
 }
