@@ -115,13 +115,27 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             if (!selected.HasValue)
                 return;
 
-            var data = await tableDataProvider.Load(tableDefinition.Id, (uint) selected);
+            uint key = (uint) selected;
+
+            if (ContainsKey(key))
+            {
+                await messageBoxService.ShowDialog(new MessageBoxFactory<bool>()
+                    .SetTitle("Key already added")
+                    .SetMainInstruction($"Key {key} is already added to this editor")
+                    .SetContent("To add a new row, click (+) sign next to the key name")
+                    .WithOkButton(true)
+                    .SetIcon(MessageBoxIcon.Warning)
+                    .Build());
+                return;
+            }
+            
+            var data = await tableDataProvider.Load(tableDefinition.Id, key);
             if (data == null) 
                 return;
 
-            OnKeyAdded?.Invoke((uint)selected);
+            OnKeyAdded?.Invoke(key);
             
-            EnsureKey((uint)selected);
+            EnsureKey(key);
 
             foreach (var entity in data.Entities)
                 await AddEntity(entity);
@@ -322,6 +336,11 @@ namespace WDE.DatabaseEditors.ViewModels.MultiRow
             }
         }
 
+        private bool ContainsKey(uint key)
+        {
+            return keys.Contains(key);
+        }
+        
         private void EnsureKey(uint entity)
         {
             if (keys.Add(entity))

@@ -112,7 +112,7 @@
     
     <DockPanel LastChildFill="True">
         <StackPanel Margin="10" VerticalAlignment="Center" DockPanel.Dock="Top">
-            <Button Command="{Binding AddNewCommand, Mode=OneTime}">
+            <Button Command="{Binding AddNewCommand, Mode=OneTime}" HorizontalAlignment="Left">
                 Add new key
             </Button>
         </StackPanel>
