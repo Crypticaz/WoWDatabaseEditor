@@ -1,22 +1,29 @@
 ﻿{
   "id": "creature_loot_template_tc_335",
-  "compatibility": ["TrinityWrath"],
+  "compatibility": [
+    "TrinityWrath"
+  ],
   "name": "Creature Loot Template",
+  "single_solution_name": "{name}'s loot",
+  "multi_solution_name": "Multiple creatures loot template",
+  "description": "To define items dropped by creature, use this table",
   "table_name": "creature_loot_template",
   "table_index_name": "Entry",
-  "table_name_source_field": "",
-  "picker": "CreatureParameter",
   "multi_record": true,
+  "reload_command": "reload creature_loot_template",
+  "picker": "CreatureParameter",
+  "primary_key": [
+    "Entry",
+    "Item"
+  ],
   "groups": [
     {
-      "group_name": "Items",
-      "group_sort_field": "Item",
+      "group_name": "group",
       "fields": [
         {
-          "name": "Entry",
+          "name": "Creature",
           "db_column_name": "Entry",
-          "value_type": "uint",
-          "read_only": true
+          "value_type": "CreatureParameter"
         },
         {
           "name": "Item",
@@ -24,44 +31,49 @@
           "value_type": "ItemParameter"
         },
         {
-          "name": "Loot table reference",
+          "name": "Reference",
           "db_column_name": "Reference",
           "value_type": "uint"
         },
         {
           "name": "Chance",
           "db_column_name": "Chance",
-          "value_type": "float"
+          "value_type": "float",
+          "default": 100
         },
         {
-          "name": "Required quest",
+          "name": "Quest Required",
           "db_column_name": "QuestRequired",
           "value_type": "QuestParameter"
         },
         {
-          "name": "Loot mode",
+          "name": "Loot Mode",
           "db_column_name": "LootMode",
-          "value_type": "LootModeParameter"
+          "value_type": "LootModeParameter",
+          "default": 1
         },
         {
-          "name": "GroupId",
+          "name": "Group Id",
           "db_column_name": "GroupId",
           "value_type": "uint"
         },
         {
-          "name": "Min count",
+          "name": "Min Count",
           "db_column_name": "MinCount",
-          "value_type": "uint"
+          "value_type": "uint",
+          "default": 1
         },
         {
-          "name": "Max count",
+          "name": "Max Count",
           "db_column_name": "MaxCount",
-          "value_type": "uint"
+          "value_type": "uint",
+          "default": 1
         },
         {
           "name": "Comment",
           "db_column_name": "Comment",
-          "value_type": "string"
+          "value_type": "string",
+          "can_be_null": true
         }
       ]
     }

@@ -108,6 +108,10 @@ namespace WDE.DatabaseEditors.Data
                     {
                         valueHolder = new ValueHolder<long>(column.Value.value as short? ?? 0);
                     }
+                    else if (column.Value.type == typeof(bool))
+                    {
+                        valueHolder = new ValueHolder<long>(column.Value.value is DBNull ? 0 : ((bool)column.Value.value ? 1 : 0));
+                    }
                     else
                     {
                         throw new NotImplementedException();
