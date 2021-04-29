@@ -82,7 +82,7 @@ namespace WDE.DatabaseEditors.WPF.Helpers
                     definition.Width = new GridLength(5, GridUnitType.Pixel);
                     grid.ColumnDefinitions.Add(definition);
 
-                    var tb = new TextBlock() { Text = column.Name };
+                    var tb = new TextBlock() { Text = column.Name, Padding = new Thickness(16,6,6,6) };
                     tb.SetValue(Grid.ColumnProperty, index * 2);
                     grid.Children.Add(tb);
 
