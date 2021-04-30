@@ -12,6 +12,7 @@
   "multi_record": true,
   "reload_command": "reload gossip_menu_option",
   "picker": "Parameter",
+  "group_name": "Common scripting tables",
   "primary_key": [
     "MenuID",
     "OptionID"

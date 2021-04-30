@@ -16,6 +16,9 @@ namespace WDE.DatabaseEditors.Data.Structs
         [JsonProperty(PropertyName = "name")] 
         public string Name { get; set; } = "";
         
+        [JsonProperty(PropertyName = "group_name")] 
+        public string? GroupName { get; set; }
+        
         [JsonProperty(PropertyName = "single_solution_name")] 
         public string SingleSolutionName { get; set; } = "";
         

@@ -9,6 +9,7 @@
   "single_solution_name": "Gameobject {name} template",
   "multi_solution_name": "Multiple gameobjects template",
   "picker": "GameobjectParameter",
+  "group_name": "Templates",
   "foreign_tables": [
     {
       "table_name": "gameobject_template_addon",

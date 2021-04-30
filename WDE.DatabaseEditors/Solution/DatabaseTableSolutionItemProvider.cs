@@ -73,7 +73,7 @@ namespace WDE.DatabaseEditors.Solution
 
         public string GetDescription() => definition.Description;
         
-        public string GetGroupName() => "Database tables";
+        public string GetGroupName() => definition.GroupName ?? "Database tables";
 
         public bool IsCompatibleWithCore(ICoreVersion core) => true;
 

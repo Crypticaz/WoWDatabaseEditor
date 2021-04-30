@@ -10,6 +10,7 @@
   "multi_solution_name": "Multiple creatures template",
   "reload_command": "reload creature_template",
   "picker": "CreatureParameter",
+  "group_name": "Templates",
   "foreign_tables": [
     {
       "table_name": "creature_template_addon",

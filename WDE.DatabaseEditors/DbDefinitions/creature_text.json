@@ -12,6 +12,7 @@
   "reload_command": "reload creature_text",
   "multi_record": true,
   "picker": "CreatureParameter",
+  "group_name": "Common scripting tables",
   "primary_key": ["CreatureID", "GroupID", "ID"],
   "groups": [
     {

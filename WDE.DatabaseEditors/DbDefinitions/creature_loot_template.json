@@ -12,6 +12,7 @@
   "multi_record": true,
   "reload_command": "reload creature_loot_template",
   "picker": "CreatureParameter",
+  "group_name": "Loot templates",
   "primary_key": [
     "Entry",
     "Item"

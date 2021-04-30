@@ -12,6 +12,7 @@
   "reload_command": "reload spell_area",
   "multi_record": true,
   "picker": "ZoneAreaParameter",
+  "group_name": "Common scripting tables",
   "primary_key": ["spell", "area", "quest_start", "aura_spell", "racemask", "gender"],
   "groups": [
     {

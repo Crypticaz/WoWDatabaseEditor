@@ -58,7 +58,7 @@
         </Style>
         <Style Selector="Border.header TextBlock">
             <Setter Property="VerticalAlignment" Value="Center" />
-            <Setter Property="Padding" Value="20,0,0,0" />
+            <Setter Property="Padding" Value="4" />
             <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
         </Style>
         <Style Selector="GridSplitter">

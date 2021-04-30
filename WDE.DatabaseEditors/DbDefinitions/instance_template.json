@@ -9,6 +9,7 @@
   "single_solution_name": "Instance {name} template",
   "multi_solution_name": "Multiple instances template",
   "picker": "MapParameter",
+  "group_name": "Templates",
   "groups": [
     {
       "group_name": "Instance",
