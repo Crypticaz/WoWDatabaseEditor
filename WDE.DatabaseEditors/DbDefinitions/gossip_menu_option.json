@@ -11,7 +11,7 @@
   "table_index_name": "MenuID",
   "multi_record": true,
   "reload_command": "reload gossip_menu_option",
-  "picker": "Parameter",
+  "picker": "GossipMenuParameter",
   "group_name": "Common scripting tables",
   "primary_key": [
     "MenuID",
