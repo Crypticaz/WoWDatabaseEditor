@@ -20,6 +20,16 @@
         </Setter>
     </Style>
     <Style TargetType="{x:Type local:FastCellView}">
+        <Style.Resources>
+            <Style TargetType="{x:Type Button}" BasedOn="{StaticResource {x:Type Button}}">
+                <Setter Property="Visibility" Value="Hidden" />
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding RelativeSource={RelativeSource AncestorType={x:Type local:FastCellView},AncestorLevel=1}, Path=IsMouseOver}" Value="True" >
+                        <Setter Property="Visibility" Value="Visible" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+        </Style.Resources>
         <Setter Property="FontFamily" Value="Consolas,Menlo,Courier,Courier New" />
         <Setter Property="Template">
             <Setter.Value>

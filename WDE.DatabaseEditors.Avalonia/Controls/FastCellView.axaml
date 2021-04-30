@@ -20,4 +20,10 @@
             </ControlTemplate>
         </Setter>
     </Style>
+    <Style Selector="controls|FastCellView Button">
+        <Setter Property="IsVisible" Value="False" />
+    </Style>
+    <Style Selector="controls|FastCellView:pointerover Button">
+        <Setter Property="IsVisible" Value="True" />
+    </Style>
 </Styles>
