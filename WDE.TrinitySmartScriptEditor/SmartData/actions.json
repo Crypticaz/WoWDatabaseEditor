@@ -10,6 +10,7 @@
     {
         "id": 1,
         "name": "SMART_ACTION_TALK",
+        "tags": ["TrinityWrath", "Azeroth", "TrinityMaster", "TrinityCata"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -25,6 +26,27 @@
                 "type": "BoolParameter",
                 "name": "UseTalkTarget",
                 "description": "Talker will target {target}"
+            }
+        ],
+        "description": "{pram3value:choose(0):{sourceid:choose(0):[s]Self[/s]|{source}}: Talk {pram1} to invoker|[s]Self[/s]: Talk {pram1} to {source}}",
+        "name_readable": "Talk",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 1,
+        "name": "SMART_ACTION_TALK",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Group ID",
+                "description": "Group id from table creature_text. Random text will be said if multiple rows with the same group"
+            },
+            {
+                "type": "Parameter",
+                "name": "Delay",
+                "description": "Duration to wait before TEXT_OVER event is triggered"
             }
         ],
         "description": "{pram3value:choose(0):{sourceid:choose(0):[s]Self[/s]|{source}}: Talk {pram1} to invoker|[s]Self[/s]: Talk {pram1} to {source}}",
@@ -70,6 +92,7 @@
     {
         "id": 4,
         "name": "SMART_ACTION_SOUND",
+        "tags": ["TrinityWrath", "Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "SoundParameter",
@@ -86,6 +109,26 @@
             }
         ],
         "description": "{source}: Play {pram3value:choose(0):direct|distance} sound {pram1} to {pram2value:choose(0):every player in visibility range of {source}|{source}}",
+        "name_readable": "Sound",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 4,
+        "name": "SMART_ACTION_SOUND",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "SoundParameter",
+                "name": "Sound ID"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Only to self",
+                "description": "True - only target will hear the sound, false - everyone in visibility range will hear the sound"
+            }
+        ],
+        "description": "{source}: Play {pram2value:choose(0):direct|distance} sound {pram1} to every player in visibility range",
         "name_readable": "Sound",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -123,6 +166,7 @@
     {
         "id": 7,
         "name": "SMART_ACTION_OFFER_QUEST",
+        "tags": ["TrinityWrath", "Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "QuestParameter",
@@ -136,6 +180,22 @@
             }
         ],
         "description": "{source}: {pram2value:choose(0):Offer quest {pram1}|Add quest {pram1} to quest log}",
+        "name_readable": "Add quest",
+        "target_types": ["Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 7,
+        "name": "SMART_ACTION_ADD_QUEST",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "QuestParameter",
+                "name": "Quest ID",
+                "description": "Add quest, only for players"
+            }
+        ],
+        "description": "{source}: {Add quest {pram1} to quest log}",
         "name_readable": "Add quest",
         "target_types": ["Player"],
         "target_is_source": true
@@ -165,6 +225,7 @@
     {
         "id": 10,
         "name": "SMART_ACTION_RANDOM_EMOTE",
+        "tags": ["TrinityWrath", "Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "EmoteParameter",
@@ -205,6 +266,7 @@
     {
         "id": 11,
         "name": "SMART_ACTION_CAST",
+        "tags": ["TrinityWrath", "Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "SpellParameter",
@@ -225,6 +287,27 @@
             }
         ],
         "description": "{source}: Cast spell {pram1} on{pram4value:choose(0):| random {pram4}} {target}{pram2value:choose(0):| (flags: {pram2})}",
+        "name_readable": "Cast",
+        "target_types": ["Player", "Creature"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF"
+    },
+    {
+        "id": 11,
+        "name": "SMART_ACTION_CAST",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell",
+                "description": "Spell id to cast"
+            },
+            {
+                "type": "SmartCastFlagsParameter",
+                "name": "Cast Flags"
+            }
+        ],
+        "description": "{source}: Cast spell {pram1} on target {pram2value:choose(0):| (flags: {pram2})}",
         "name_readable": "Cast",
         "target_types": ["Player", "Creature"],
         "target_is_source": false,
@@ -277,7 +360,7 @@
     {
         "id": 12,
         "name": "SMART_ACTION_SUMMON_CREATURE",
-        "tags": ["Azeroth", "TrinityCata"],
+        "tags": ["Azeroth", "TrinityCata", "SkyFire"],
         "parameters": [
             {
                 "type": "CreatureParameter",
@@ -403,6 +486,7 @@
     {
         "id": 16,
         "name": "SMART_ACTION_SET_INGAME_PHASE_GROUP",
+        "tags": ["TrinityWrath", "Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -552,7 +636,7 @@
     {
         "id": 24,
         "name": "SMART_ACTION_EVADE",
-        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata", "SkyFire"],
         "description": "{source}: Evade",
         "name_readable": "Evade",
         "target_is_source": false,
@@ -600,7 +684,7 @@
     {
         "id": 26,
         "name": "SMART_ACTION_CALL_GROUPEVENTHAPPENS_AC",
-        "tags": ["Azeroth"],
+        "tags": ["Azeroth", "SkyFire"],
         "parameters": [
             {
                 "type": "QuestParameter",
@@ -615,6 +699,7 @@
     {
         "id": 28,
         "name": "SMART_ACTION_REMOVEAURASFROMSPELL",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata", "Azeroth"],
         "parameters": [
             {
                 "type": "SpellParameter",
@@ -629,6 +714,27 @@
             {
                 "type": "BoolParameter",
                 "name": "Only owned auras"
+            }
+        ],
+        "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
+        "name_readable": "Remove aura",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 28,
+        "name": "SMART_ACTION_REMOVEAURASFROMSPELL",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell",
+                "description": "Spell id to remove aura, if 0, all auras will be removed"
+            },
+            {
+                "type": "Parameter",
+                "name": "Charges",
+                "description": "If 0 all charges are removed"
             }
         ],
         "description": "{source}: {pram1value:choose(0):Remove all auras|Remove{pram2value:choose(0):| {pram2} charges of} aura due to spell {pram1}}",
@@ -758,6 +864,7 @@
     {
         "id": 34,
         "name": "SMART_ACTION_SET_INST_DATA",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -786,6 +893,25 @@
         "implicit_source": "SMART_TARGET_NONE"
     },
     {
+        "id": 34,
+        "name": "SMART_ACTION_SET_INST_DATA",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Field"
+            },
+            {
+                "type": "Parameter",
+                "name": "Data"
+            }
+        ],
+        "description": "Set #{pram1} to {pram2}",
+        "name_readable": "Set instance data",
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_NONE"
+    },
+    {
         "id": 35,
         "name": "SMART_ACTION_SET_INST_DATA64",
         "parameters": [
@@ -802,6 +928,7 @@
     {
         "id": 36,
         "name": "SMART_ACTION_UPDATE_TEMPLATE",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata", "Azeroth"],
         "parameters": [
             {
                 "type": "CreatureParameter",
@@ -813,6 +940,25 @@
             }
         ],
         "description": "{source}: Update template{pram2value:choose(0):| and level} as if it was creature {pram1}",
+        "name_readable": "Update NPC template",
+        "target_types": ["Creature"],
+        "target_is_source": true
+    },
+    {
+        "id": 36,
+        "name": "SMART_ACTION_UPDATE_TEMPLATE",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "CreatureParameter",
+                "name": "Entry"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "Team"
+            }
+        ],
+        "description": "{source}: Update template{pram2value:choose(0):| and team} as if it was creature {pram1}",
         "name_readable": "Update NPC template",
         "target_types": ["Creature"],
         "target_is_source": true
@@ -868,6 +1014,7 @@
     {
         "id": 41,
         "name": "SMART_ACTION_FORCE_DESPAWN",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata", "Azeroth"],
         "parameters": [
             {
                 "type": "FloatParameter",
@@ -879,6 +1026,21 @@
             }
         ],
         "description": "{source}: Despawn {pram1value:choose(0):instantly|in {pram1} s}{pram2value:choose(0):| respawn in {pram2} seconds}",
+        "name_readable": "Force despawn",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 41,
+        "name": "SMART_ACTION_FORCE_DESPAWN",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "FloatParameter",
+                "name": "Delay"
+            }
+        ],
+        "description": "{source}: Despawn {pram1value:choose(0):instantly|in {pram1} s}",
         "name_readable": "Force despawn",
         "target_types": ["Creature", "GameObject"],
         "target_is_source": true
@@ -957,7 +1119,7 @@
     },
     {
         "id": 46,
-        "tags": ["Azeroth"],
+        "tags": ["Azeroth", "SkyFire"],
         "name": "SMART_ACTION_MOVE_FORWARD_AC",
         "parameters": [
             {
@@ -1019,6 +1181,7 @@
     {
         "id": 50,
         "name": "SMART_ACTION_SUMMON_GO",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1040,6 +1203,28 @@
                         "name": "GO_SUMMON_TIMED_DESPAWN"
                     }
                 }
+            }
+        ],
+        "description": "{source}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
+        "name_readable": "Summon gameobject",
+        "target_types": ["Player", "Creature", "GameObject", "Position"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
+        "id": 50,
+        "name": "SMART_ACTION_SUMMON_GO",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Game Object"
+            },
+            {
+                "type": "Parameter",
+                "name": "Despawn Time",
+                "description": "In ms"
             }
         ],
         "description": "{source}: Summon gameobject {pram1} at {targetid:choose(8):{targetcoords}|my position, moved by offset {targetcoords}} and despawn in {pram2} ms",
@@ -1237,7 +1422,7 @@
     {
         "id": 59,
         "name": "SMART_ACTION_SET_RUN",
-        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata"],
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata", "SkyFire"],
         "parameters": [
             {
                 "type": "SwitchParameter",
@@ -1295,7 +1480,7 @@
     {
         "id": 60,
         "name": "SMART_ACTION_SET_FLY_AC",
-        "tags": ["Azeroth"],
+        "tags": ["Azeroth", "SkyFire"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -1348,6 +1533,7 @@
     {
         "id": 63,
         "name": "SMART_ACTION_SET_COUNTER",
+        "tags": ["TrinityWrath", "TrinityMaster", "TrinityCata", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1363,6 +1549,25 @@
             }
         ],
         "description": "{source}: {pram3value:choose(0):Smart script [p]variable_[/p]{pram1} = {pram2}|Reset smart script [p]variable_[/p]{pram1}}",
+        "name_readable": "Set counter",
+        "target_types": ["Creature", "GameObject"],
+        "target_is_source": true
+    },
+    {
+        "id": 63,
+        "name": "SMART_ACTION_STORE_VARIABLE_DECIMAL",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Variable ID"
+            },
+            {
+                "type": "Parameter",
+                "name": "Value"
+            }
+        ],
+        "description": "{source}: Smart script [p]variable_[/p]{pram1} = {pram2}",
         "name_readable": "Set counter",
         "target_types": ["Creature", "GameObject"],
         "target_is_source": true
@@ -1393,7 +1598,7 @@
     {
         "id": 66,
         "name": "SMART_ACTION_SET_ORIENTATION",
-        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster"],
+        "tags": ["TrinityWrath", "TrinityCata", "TrinityMaster", "SkyFire"],
         "description": "{source}: {targetid:choose(1|8):Set orientation to home position orientation|Set orientation to {target_o}|Look at {target}}",
         "name_readable": "Set orientation",
         "target_is_source": false,
@@ -1478,6 +1683,7 @@
     {
         "id": 69,
         "name": "SMART_ACTION_MOVE_TO_POS",
+        "tags": ["Azeroth", "TrinityCata", "TrinityMaster", "TrinityWrath"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1505,6 +1711,27 @@
         "uses_target_position": true
     },
     {
+        "id": 69,
+        "name": "SMART_ACTION_MOVE_TO_POS",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "PointId"
+            },
+            {
+                "type": "BoolParameter",
+                "name": "IsTransport"
+            }
+        ],
+        "description": "{source}: Move to {targetid:choose(8):position {targetcoords}{pram2value:choose(0):| on transport}|{target} (point id {pram1})",
+        "name_readable": "Move to position",
+        "target_types": ["GameObject", "Player", "Creature"],
+        "target_is_source": false,
+        "implicit_source": "SMART_TARGET_SELF",
+        "uses_target_position": true
+    },
+    {
         "id": 70,
         "name": "SMART_ACTION_ENABLE_TEMP_GOBJ",
         "tags": ["TrinityWrath", "TrinityCata"],
@@ -1522,7 +1749,7 @@
     {
         "id": 70,
         "name": "SMART_ACTION_RESPAWN_TARGET",
-        "tags": ["Azeroth", "TrinityMaster"],
+        "tags": ["Azeroth", "TrinityMaster", "SkyFire"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1666,6 +1893,7 @@
     {
         "id": 80,
         "name": "SMART_ACTION_CALL_TIMED_ACTIONLIST",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -1684,6 +1912,31 @@
             {
                 "type": "BoolParameter",
                 "name": "Allow override"
+            }
+        ],
+        "description": "{source}: Start timed action list id #{pram1} ({pram2})",
+        "name_readable": "Call timed action list",
+        "target_is_source": true,
+        "target_types": ["Creature", "GameObject"]
+    },
+    {
+        "id": 80,
+        "name": "SMART_ACTION_CALL_TIMED_ACTIONLIST",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "ID",
+                "description": "overwrites already running actionlist?"
+            },
+            {
+                "type": "SwitchParameter",
+                "name": "Update type",
+                "values": {
+                    "0": {"name": "update out of combat"},
+                    "1": {"name": "update in combat"},
+                    "2": {"name": "update always"}
+                }
             }
         ],
         "description": "{source}: Start timed action list id #{pram1} ({pram2})",
@@ -1751,6 +2004,7 @@
     {
         "id": 85,
         "name": "SMART_ACTION_SELF_CAST",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "SpellParameter",
@@ -1768,6 +2022,26 @@
             {
                 "type": "Parameter",
                 "name": "TargetsLimit"
+            }
+        ],
+        "description": "{pram4value:choose(0):| Random {pram4}} {source}: Cast spell {pram1} on self",
+        "name_readable": "Invoker cast",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 85,
+        "name": "SMART_ACTION_INVOKER_CAST",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "SpellParameter",
+                "name": "Spell",
+                "description": "Spell id to cast"
+            },
+            {
+                "type": "SmartCastFlagsParameter",
+                "name": "Cast Flags"
             }
         ],
         "description": "{pram4value:choose(0):| Random {pram4}} {source}: Cast spell {pram1} on self",
@@ -2356,7 +2630,31 @@
     },
     {
         "id": 113,
+        "name": "SMART_ACTION_SET_HEALTH",
+        "tags": ["SkyFire"],
+        "parameters": [
+            {
+                "type": "Parameter",
+                "name": "Healthpoint"
+            },
+            {
+                "type": "Parameter",
+                "name": "Healthpointmod"
+            },
+            {
+                "type": "Parameter",
+                "name": "Percent"
+            }
+        ],
+        "description": "{source}: Set current health to {pram3}%",
+        "name_readable": "Set health",
+        "target_types": ["Creature", "Player"],
+        "target_is_source": true
+    },
+    {
+        "id": 113,
         "name": "SMART_ACTION_START_CLOSEST_WAYPOINT",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2391,6 +2689,7 @@
     {
         "id": 114,
         "name": "SMART_ACTION_MOVE_OFFSET",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "description": "{source}: Move by offset {targetcoords}",
         "name_readable": "Move by offset",
         "target_types": ["Creature"],
@@ -2400,6 +2699,7 @@
     {
         "id": 115,
         "name": "SMART_ACTION_RANDOM_SOUND",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "SoundParameter",
@@ -2434,6 +2734,7 @@
     {
         "id": 116,
         "name": "SMART_ACTION_SET_CORPSE_DELAY",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "FloatParameter",
@@ -2452,6 +2753,7 @@
     {
         "id": 117,
         "name": "SMART_ACTION_DISABLE_EVADE",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -2467,6 +2769,7 @@
     {
         "id": 118,
         "name": "SMART_ACTION_GO_SET_GO_STATE",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "SwitchParameter",
@@ -2498,6 +2801,7 @@
     {
         "id": 119,
         "name": "SMART_ACTION_SET_CAN_FLY",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "BoolParameter",
@@ -2512,6 +2816,7 @@
     {
         "id": 120,
         "name": "SMART_ACTION_REMOVE_AURAS_BY_TYPE",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "AuraTypeParameter",
@@ -2526,6 +2831,7 @@
     {
         "id": 121,
         "name": "SMART_ACTION_SET_SIGHT_DIST",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2540,6 +2846,7 @@
     {
         "id": 122,
         "name": "SMART_ACTION_FLEE",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2554,6 +2861,7 @@
     {
         "id": 123,
         "name": "SMART_ACTION_ADD_THREAT",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2573,6 +2881,7 @@
     {
         "id": 124,
         "name": "SMART_ACTION_LOAD_EQUIPMENT",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2591,6 +2900,7 @@
     {
         "id": 125,
         "name": "SMART_ACTION_TRIGGER_RANDOM_TIMED_EVENT",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2609,6 +2919,7 @@
     {
         "id": 126,
         "name": "SMART_ACTION_REMOVE_ALL_GAMEOBJECTS",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "description": "{source}: Removes gameobjects",
         "name_readable": "Remove all gameobjects",
         "target_types": ["Creature", "Player"],
@@ -2659,6 +2970,7 @@
     {
         "id": 128,
         "name": "SMART_ACTION_PLAY_ANIMKIT",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2691,6 +3003,7 @@
     {
         "id": 129,
         "name": "SMART_ACTION_SCENE_PLAY",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2705,6 +3018,7 @@
     {
         "id": 130,
         "name": "SMART_ACTION_SCENE_CANCEL",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2719,6 +3033,7 @@
     {
         "id": 131,
         "name": "SMART_ACTION_SPAWN_SPAWNGROUP",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2751,6 +3066,7 @@
     {
         "id": 132,
         "name": "SMART_ACTION_DESPAWN_SPAWNGROUP",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "Parameter",
@@ -2783,6 +3099,7 @@
     {
         "id": 133,
         "name": "SMART_ACTION_RESPAWN_BY_SPAWNID",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "SwitchParameter",
@@ -3436,6 +3753,7 @@
     {
         "id": 9999,
         "name": "SMART_ACTION_META_WAIT",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "FloatParameter",
@@ -3450,6 +3768,7 @@
     {
         "id": 9998,
         "name": "SMART_ACTION_META_COMMENT",
+        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "description": "",
         "name_readable": "Comment",
         "comment_field": "Comment",
