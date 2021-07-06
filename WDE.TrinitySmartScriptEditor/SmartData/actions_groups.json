@@ -10,11 +10,13 @@
         "name": "Talk; sounds",
         "group_members": [
             "SMART_ACTION_TALK",
+            "SMART_ACTION_TALK_SF",
             "SMART_ACTION_SIMPLE_TALK",
             "SMART_ACTION_PLAY_EMOTE",
             "SMART_ACTION_RANDOM_EMOTE",
             "SMART_ACTION_SET_EMOTE_STATE",
             "SMART_ACTION_SOUND",
+            "SMART_ACTION_SOUND_SF",
             "SMART_ACTION_PLAYMOVIE",
             "SMART_ACTION_RANDOM_SOUND",
             "SMART_ACTION_MUSIC_AC",
@@ -28,6 +30,7 @@
         "group_members": [
             "SMART_ACTION_FAIL_QUEST",
             "SMART_ACTION_OFFER_QUEST",
+            "SMART_ACTION_ADD_QUEST_SF",
             "SMART_ACTION_CALL_KILLEDMONSTER",
             "SMART_ACTION_CALL_AREAEXPLOREDOREVENTHAPPENS",
             "SMART_ACTION_CALL_GROUPEVENTHAPPENS",
@@ -38,10 +41,13 @@
         "name": "Spells",
         "group_members": [
             "SMART_ACTION_CAST",
+            "SMART_ACTION_CAST_SF",
             "SMART_ACTION_INVOKER_CAST",
+            "SMART_ACTION_INVOKER_CAST_SF",
             "SMART_ACTION_CROSS_CAST",
             "SMART_ACTION_ADD_AURA",
             "SMART_ACTION_REMOVEAURASFROMSPELL",
+            "SMART_ACTION_REMOVEAURASFROMSPELL_SF",
             "SMART_ACTION_INTERRUPT_SPELL",
             "SMART_ACTION_REMOVE_AURAS_BY_TYPE",
             "SMART_ACTION_PLAY_SPELL_VISUAL_KIT",
@@ -57,6 +63,7 @@
             "SMART_ACTION_EVADE_AC",
             "SMART_ACTION_FOLLOW",
             "SMART_ACTION_MOVE_TO_POS",
+            "SMART_ACTION_MOVE_TO_POS_SF",
             "SMART_ACTION_MOVE_TO_POS_TARGET_AC",
             "SMART_ACTION_JUMP_TO_POS",
             "SMART_ACTION_RANDOM_MOVE",
@@ -93,6 +100,7 @@
         "name": "Template",
         "group_members": [
             "SMART_ACTION_UPDATE_TEMPLATE",
+            "SMART_ACTION_UPDATE_TEMPLATE_SF",
             "SMART_ACTION_SET_FACTION",
             "SMART_ACTION_MORPH_TO_ENTRY_OR_MODEL",
             "SMART_ACTION_SET_UNIT_FLAG",
@@ -140,6 +148,7 @@
             "SMART_ACTION_TRIGGER_TIMED_EVENT",
             "SMART_ACTION_REMOVE_TIMED_EVENT",
             "SMART_ACTION_CALL_TIMED_ACTIONLIST",
+            "SMART_ACTION_CALL_TIMED_ACTIONLIST_SF",
             "SMART_ACTION_CALL_RANDOM_TIMED_ACTIONLIST",
             "SMART_ACTION_CALL_RANDOM_RANGE_TIMED_ACTIONLIST"
         ]
@@ -151,6 +160,7 @@
             "SMART_ACTION_SUMMON_CREATURE_TC_MASTER",
             "SMART_ACTION_SUMMON_CREATURE_TC_WRATH",
             "SMART_ACTION_SUMMON_GO",
+            "SMART_ACTION_SUMMON_GO_SF",
             "SMART_ACTION_SUMMON_CREATURE_GROUP",
             "SMART_ACTION_CONE_SUMMON_AC",
             "SMART_ACTION_VORTEX_SUMMON_AC"
@@ -168,6 +178,7 @@
         "name": "Instance",
         "group_members": [
             "SMART_ACTION_SET_INST_DATA",
+            "SMART_ACTION_SET_INST_DATA_SF",
             "SMART_ACTION_SET_INST_DATA64"
         ]
     },
@@ -202,6 +213,7 @@
             "SMART_ACTION_SET_HOVER",
             "SMART_ACTION_SET_HOVER_AC",
             "SMART_ACTION_FORCE_DESPAWN",
+            "SMART_ACTION_FORCE_DESPAWN_SF",
             "SMART_ACTION_MOUNT_TO_ENTRY_OR_MODEL",
             "SMART_ACTION_SET_CORPSE_DELAY",
             "SMART_ACTION_DISABLE_EVADE",
@@ -234,7 +246,8 @@
         "group_members": [
             "SMART_ACTION_SET_HEALTH_REGEN",
             "SMART_ACTION_SET_INVINCIBILITY_HP_LEVEL",
-            "SMART_ACTION_SET_HEALTH_PCT"
+            "SMART_ACTION_SET_HEALTH_PCT",
+            "SMART_ACTION_SET_HEALTH_SF"
         ]
     },
     {
