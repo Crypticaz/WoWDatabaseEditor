@@ -35,7 +35,7 @@
     },
     {
         "id": 1,
-        "name": "SMART_ACTION_TALK",
+        "name": "SMART_ACTION_TALK_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -115,7 +115,7 @@
     },
     {
         "id": 4,
-        "name": "SMART_ACTION_SOUND",
+        "name": "SMART_ACTION_SOUND_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -186,7 +186,7 @@
     },
     {
         "id": 7,
-        "name": "SMART_ACTION_ADD_QUEST",
+        "name": "SMART_ACTION_ADD_QUEST_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -195,7 +195,7 @@
                 "description": "Add quest, only for players"
             }
         ],
-        "description": "{source}: {Add quest {pram1} to quest log}",
+        "description": "{source}: {Add quest {pram1} to quest log",
         "name_readable": "Add quest",
         "target_types": ["Player"],
         "target_is_source": true
@@ -225,7 +225,6 @@
     {
         "id": 10,
         "name": "SMART_ACTION_RANDOM_EMOTE",
-        "tags": ["TrinityWrath", "Azeroth", "TrinityCata", "TrinityMaster"],
         "parameters": [
             {
                 "type": "EmoteParameter",
@@ -294,7 +293,7 @@
     },
     {
         "id": 11,
-        "name": "SMART_ACTION_CAST",
+        "name": "SMART_ACTION_CAST_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -723,7 +722,7 @@
     },
     {
         "id": 28,
-        "name": "SMART_ACTION_REMOVEAURASFROMSPELL",
+        "name": "SMART_ACTION_REMOVEAURASFROMSPELL_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -894,7 +893,7 @@
     },
     {
         "id": 34,
-        "name": "SMART_ACTION_SET_INST_DATA",
+        "name": "SMART_ACTION_SET_INST_DATA_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -946,7 +945,7 @@
     },
     {
         "id": 36,
-        "name": "SMART_ACTION_UPDATE_TEMPLATE",
+        "name": "SMART_ACTION_UPDATE_TEMPLATE_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -954,11 +953,15 @@
                 "name": "Entry"
             },
             {
-                "type": "BoolParameter",
-                "name": "Team"
+                "type": "SwitchParameter",
+                "name": "Team",
+                "values": {
+                    "0": {"name": "horde"},
+                    "1": {"name": "alliance"}
+                }
             }
         ],
-        "description": "{source}: Update template{pram2value:choose(0):| and team} as if it was creature {pram1}",
+        "description": "{source}: Update template as if it was creature {pram1}, {pram2}",
         "name_readable": "Update NPC template",
         "target_types": ["Creature"],
         "target_is_source": true
@@ -1032,7 +1035,7 @@
     },
     {
         "id": 41,
-        "name": "SMART_ACTION_FORCE_DESPAWN",
+        "name": "SMART_ACTION_FORCE_DESPAWN_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -1042,8 +1045,9 @@
         ],
         "description": "{source}: Despawn {pram1value:choose(0):instantly|in {pram1} s}",
         "name_readable": "Force despawn",
-        "target_types": ["Creature", "GameObject"],
-        "target_is_source": true
+        "implicit_source": "SMART_TARGET_SELF",
+        "target_is_source": false,
+        "usable_with_script_types": ["Creature", "TimedActionList"]
     },
     {
         "id": 42,
@@ -1214,7 +1218,7 @@
     },
     {
         "id": 50,
-        "name": "SMART_ACTION_SUMMON_GO",
+        "name": "SMART_ACTION_SUMMON_GO_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -1555,7 +1559,7 @@
     },
     {
         "id": 63,
-        "name": "SMART_ACTION_STORE_VARIABLE_DECIMAL",
+        "name": "SMART_ACTION_STORE_VARIABLE_DECIMAL_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -1569,8 +1573,8 @@
         ],
         "description": "{source}: Smart script [p]variable_[/p]{pram1} = {pram2}",
         "name_readable": "Set counter",
-        "target_types": ["Creature", "GameObject"],
-        "target_is_source": true
+        "implicit_source": "SMART_TARGET_SELF",
+        "target_is_source": false
     },
     {
         "id": 64,
@@ -1712,7 +1716,7 @@
     },
     {
         "id": 69,
-        "name": "SMART_ACTION_MOVE_TO_POS",
+        "name": "SMART_ACTION_MOVE_TO_POS_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -1921,7 +1925,7 @@
     },
     {
         "id": 80,
-        "name": "SMART_ACTION_CALL_TIMED_ACTIONLIST",
+        "name": "SMART_ACTION_CALL_TIMED_ACTIONLIST_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -2031,7 +2035,7 @@
     },
     {
         "id": 85,
-        "name": "SMART_ACTION_INVOKER_CAST",
+        "name": "SMART_ACTION_INVOKER_CAST_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
@@ -2044,10 +2048,11 @@
                 "name": "Cast Flags"
             }
         ],
-        "description": "{pram4value:choose(0):| Random {pram4}} {source}: Cast spell {pram1} on self",
+        "description": "{source}: Cast spell {pram1} on {target}",
         "name_readable": "Invoker cast",
         "target_types": ["Creature", "Player"],
-        "target_is_source": true
+        "implicit_source": "SMART_TARGET_ACTION_INVOKER",
+        "target_is_source": false
     },
     {
         "id": 86,
@@ -2630,23 +2635,67 @@
     },
     {
         "id": 113,
-        "name": "SMART_ACTION_SET_HEALTH",
+        "name": "SMART_ACTION_SET_HEALTH_SF",
         "tags": ["SkyFire"],
         "parameters": [
             {
                 "type": "Parameter",
-                "name": "Healthpoint"
+                "name": "Health point"
             },
             {
-                "type": "Parameter",
-                "name": "Healthpointmod"
+                "type": "SwitchParameter",
+                "name": "Mode",
+                "values": {
+                    "0": {"name": "heal source by source's max HP%"},
+                    "1": {"name": "make source 100% hp"},
+                    "2": {"name": "set source's HP to self HP value"},
+                    "3": {"name": "set self HP to source's HP value"},
+                    "4": {"name": "set source's max HP to self max HP value"},
+                    "5": {"name": "set self max HP to source's max HP value"},
+                    "6": {"name": "set source's max hp to absolute value"},
+                    "7": {"name": "set source's current hp to absolute value"}
+                }
             },
             {
-                "type": "Parameter",
+                "type": "PercentageParameter",
                 "name": "Percent"
             }
         ],
-        "description": "{source}: Set current health to {pram3}%",
+        "description": "[ERROR] Mode parameter out of range",
+        "description_rules": [
+            {
+                "description": "{source}: Heal by {pram3}",
+                "condition": "action.param(2) == 0"
+            },
+            {
+                "description": "{source}: Heal to max HP",
+                "condition": "action.param(2) == 1"
+            },
+            {
+                "description": "{source}: Set HP to [s]Self[/s]'s current HP",
+                "condition": "action.param(2) == 2"
+            },
+            {
+                "description": "[s]Self[/s]: Set HP to {source}'s current HP",
+                "condition": "action.param(2) == 3"
+            },
+            {
+                "description": "{source}: Set max HP to [s]Self[/s]'s max HP",
+                "condition": "action.param(2) == 4"
+            },
+            {
+                "description": "[s]Self[/s]: Set max HP to {source}'s max HP",
+                "condition": "action.param(2) == 5"
+            },
+            {
+                "description": "{source}: Set max HP to {pram1}",
+                "condition": "action.param(2) == 6"
+            },
+            {
+                "description": "{source}: Set current HP to {pram1}",
+                "condition": "action.param(2) == 7"
+            }
+        ],
         "name_readable": "Set health",
         "target_types": ["Creature", "Player"],
         "target_is_source": true
@@ -3753,7 +3802,6 @@
     {
         "id": 9999,
         "name": "SMART_ACTION_META_WAIT",
-        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "parameters": [
             {
                 "type": "FloatParameter",
@@ -3768,7 +3816,6 @@
     {
         "id": 9998,
         "name": "SMART_ACTION_META_COMMENT",
-        "tags": ["TrinityCata", "TrinityMaster", "TrinityWrath", "Azeroth"],
         "description": "",
         "name_readable": "Comment",
         "comment_field": "Comment",
